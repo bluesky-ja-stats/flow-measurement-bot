@@ -22,9 +22,7 @@ export class Bot {
 
     const agent = new AtpAgent({service: env.BLUESKY_SERVICE})
 
-    const scheduleExpression = '0 0 0,8,16 * * *'
-
-    const job = new CronJob(scheduleExpression, async () => await main(agent, createLogger({name: 'Bot', childs: ['Job']})))
+    const job = new CronJob(env.CRON_SCHEDULE, async () => await main(agent, createLogger({name: 'Bot', childs: ['Job']})))
 
     const ctx: AppContext = {
       logger,

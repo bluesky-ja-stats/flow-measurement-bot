@@ -16,6 +16,7 @@ export const env = cleanEnv(process.env, {
     choices: ['test', 'production'],
   }),
   JETSTREAM_ENDPOINT: str(),
+  CRON_SCHEDULE: str(),
   BLUESKY_SERVICE: str(),
   BLUESKY_IDENTIFIER: str(),
   BLUESKY_PASSWORD: str(),

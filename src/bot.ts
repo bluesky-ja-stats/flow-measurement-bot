@@ -1,0 +1,55 @@
+import { AtpAgent } from '@atproto/api'
+import { CronJob } from 'cron'
+import { main } from './job'
+import { type AppContext, env } from './util/config'
+import { createLogger } from './util/logger'
+
+export class Bot {
+  public agent: AtpAgent
+  public ctx: AppContext
+
+  constructor(
+    agent: AtpAgent,
+    ctx: AppContext
+  ) {
+    this.agent = agent
+    this.ctx = ctx
+  }
+
+  static async create() {
+    const logger = createLogger({name: 'Bot'})
+    logger.info(`Creating bot...`)
+
+    const agent = new AtpAgent({service: env.BLUESKY_SERVICE})
+
+    const scheduleExpression = '0 0 0,8,16 * * *'
+
+    const job = new CronJob(scheduleExpression, async () => await main(agent, createLogger({name: 'Bot', childs: ['Job']})))
+
+    const ctx: AppContext = {
+      logger,
+      job,
+    }
+
+    logger.info('Bot has been created!')
+
+    return new Bot(agent, ctx)
+  }
+
+  async start() {
+    this.ctx.logger.info(`Starting bot...`)
+    await this.agent.login({
+      identifier: env.BLUESKY_IDENTIFIER,
+      password: env.BLUESKY_PASSWORD,
+    })
+    this.ctx.job.start()
+    this.ctx.logger.info(`Done!`)
+  }
+
+  async close() {
+    this.ctx.logger.info('Stopping bot...')
+    this.ctx.job.stop()
+    await this.agent.logout()
+    this.ctx.logger.info('Bot closed')
+  }
+}

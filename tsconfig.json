@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024", "ScriptHost"],
+
+    "module": "CommonJS",
+    "rootDir": "./src",
+    "moduleResolution": "Node10",
+
+    "outDir": "./dist",
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "strict": true,
+
+    "skipLibCheck": true
+  },
+  "include": ["./src"],
+  "exclude": [
+    "./dist",
+    "./node_modules"
+  ]
+}

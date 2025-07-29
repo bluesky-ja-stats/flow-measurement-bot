@@ -10,9 +10,11 @@ const run = async () => {
 
   const bot = await Bot.create()
 
-  bot.start()
+  await bot.start()
+  logger.info('Done!')
 
   const closeSignal = async () => {
+    logger.debug('Recieved closeSignal!')
     setTimeout(() => process.exit(1), 10000).unref()
     await bot.stop()
   }

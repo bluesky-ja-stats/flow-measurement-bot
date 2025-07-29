@@ -18,7 +18,7 @@ export class Bot {
 
   static async create() {
     const logger = createLogger(['Runner', 'Bot'])
-    logger.info(`Creating bot...`)
+    logger.info('Creating bot...')
 
     const agent = new AtpAgent({service: env.BLUESKY_SERVICE})
 
@@ -35,18 +35,18 @@ export class Bot {
   }
 
   async start() {
-    this.ctx.logger.info(`Starting bot...`)
+    this.ctx.logger.info('Starting bot...')
     await this.agent.login({
       identifier: env.BLUESKY_IDENTIFIER,
       password: env.BLUESKY_PASSWORD,
     })
     this.ctx.job.start()
-    this.ctx.logger.info(`Done!`)
+    this.ctx.logger.info('Bot started')
   }
 
   async stop() {
     this.ctx.logger.info('Stopping bot...')
-    this.ctx.job.stop()
+    await this.ctx.job.stop()
     await this.agent.logout()
     this.ctx.logger.info('Bot stopped')
   }

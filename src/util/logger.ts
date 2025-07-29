@@ -1,18 +1,11 @@
 import { env } from './config'
 
-interface CreateLoggerOptions {
-  name: string
-  childs?: string[]
-}
-
-const generateLogMessage = (name: string, level: string, message: string, childs?: string[]): string[] => {
+const generateLogMessage = (level: string, childs: string[], message: string): string[] => {
   const date: Date = new Date(Date.now())
-  const dateString: string = date.toISOString().replace('T',' ').slice(0,19)
-  let prefixString: string = `${dateString} [${name}/${level}]: `
-  if (childs) {
-    for (const child of childs) {
-      prefixString += `[${child}]: `
-    }
+  const dateString: string = date.toISOString().replace('T',' ').replace('Z','')
+  let prefixString: string = `${dateString} ${`[${level}]`.padEnd(8, ' ')}`
+  for (const child of childs) {
+    prefixString += `[${child}]: `
   }
   const messageArray: string[] = []
   message.split('\n').forEach((element, index) => {
@@ -24,12 +17,10 @@ const generateLogMessage = (name: string, level: string, message: string, childs
   })
   const messageString: string = messageArray.join('\n')
   let childString: string = ""
-  if (childs) {
-    for (const child of childs) {
-      childString += `[\x1b[34m${child}\x1b[0m]: `
-    }
+  for (const child of childs) {
+    childString += `[\x1b[32m${child}\x1b[0m]: `
   }
-  return [`\x1b[90m${dateString}\x1b[0m [\x1b[32m${name}\x1b[0m/`, `${level}\u001b[0m]: ${childString}${messageString}`]
+  return [`\x1b[90m${dateString}\x1b[0m [`, `${`${level}\u001b[0m]`.padEnd(10, ' ')} ${childString}${messageString}`]
 }
 
 export interface Logger {
@@ -39,19 +30,19 @@ export interface Logger {
   error(message: string): void
 }
 
-export const createLogger = (opts: CreateLoggerOptions): Logger => {
+export const createLogger = (childs: string[]): Logger => {
   return {
     debug: (message: string): void => {
-      if (!env.isProduction) console.debug(generateLogMessage(opts.name, 'DEBUG', message, opts.childs).join('\u001b[35m'))
+      if (!env.isProduction) console.debug(generateLogMessage('DEBUG', childs, message).join('\u001b[35m'))
     },
     info: (message: string): void => {
-      console.info(generateLogMessage(opts.name, 'INFO', message, opts.childs).join('\u001b[36m'))
+      console.info(generateLogMessage('INFO', childs, message).join('\u001b[36m'))
     },
     warn: (message: string): void => {
-      console.warn(generateLogMessage(opts.name, 'WARN', message, opts.childs).join('\u001b[33m'))
+      console.warn(generateLogMessage('WARN', childs, message).join('\u001b[33m'))
     },
     error: (message: string): void => {
-      console.error(generateLogMessage(opts.name, 'ERROR', message, opts.childs).join('\u001b[31m'))
+      console.error(generateLogMessage('ERROR', childs, message).join('\u001b[31m'))
     }
   }
 }

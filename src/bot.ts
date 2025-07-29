@@ -17,12 +17,12 @@ export class Bot {
   }
 
   static async create() {
-    const logger = createLogger({name: 'Bot'})
+    const logger = createLogger(['Runner', 'Bot'])
     logger.info(`Creating bot...`)
 
     const agent = new AtpAgent({service: env.BLUESKY_SERVICE})
 
-    const job = new CronJob(env.CRON_SCHEDULE, async () => await main(agent, createLogger({name: 'Bot', childs: ['Job']})))
+    const job = new CronJob(env.CRON_SCHEDULE, async () => await main(agent, createLogger(['Runner', 'Bot', 'Job'])))
 
     const ctx: AppContext = {
       logger,
@@ -44,10 +44,10 @@ export class Bot {
     this.ctx.logger.info(`Done!`)
   }
 
-  async close() {
+  async stop() {
     this.ctx.logger.info('Stopping bot...')
     this.ctx.job.stop()
     await this.agent.logout()
-    this.ctx.logger.info('Bot closed')
+    this.ctx.logger.info('Bot stopped')
   }
 }

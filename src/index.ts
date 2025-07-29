@@ -3,18 +3,18 @@ import { env } from './util/config'
 import { createLogger } from './util/logger'
 
 const run = async () => {
-  const logger = createLogger({name: 'Runner'})
+  const logger = createLogger(['Runner'])
   logger.info(`Running ${process.env.npm_package_name} ${process.env.npm_package_version} (${env.NODE_ENV})`)
   logger.info(`System Info: Node.js ${process.version} / ${process.platform} ${process.arch}`)
   logger.debug('DebugMode is enabled.')
 
   const bot = await Bot.create()
 
-  await bot.start()
+  bot.start()
 
   const closeSignal = async () => {
     setTimeout(() => process.exit(1), 10000).unref()
-    await bot.close()
+    await bot.stop()
   }
 
   process.on('SIGHUP', closeSignal)

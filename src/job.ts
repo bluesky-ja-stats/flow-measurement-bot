@@ -1,6 +1,6 @@
 import { AtpAgent } from '@atproto/api'
 import { WebSocket } from 'ws'
-import { JetstreamEvent } from './types'
+import { type JetstreamEvent } from './types'
 import { env } from './util/config'
 import { type Logger } from './util/logger'
 
@@ -34,10 +34,9 @@ export const main = async (agent: AtpAgent, logger: Logger): Promise<void> => {
   ws.on('error', (error) => {})
   ws.on('close', async (code, reason) => {
     const d = new Date(allCursor[0]/(10**3))
-    const date = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')} GMT+0900 (日本標準時)`
-    await agent.post({
-        text: `${date}\nからの1分間で受信したBlueskyの投稿数は以下の通りです\n\n日本語: ${jaCursor.length} [post/min]\n全投稿: ${allCursor.length} [post/min]`,
-    })
-    logger.info(`${date}\nja: ${jaCursor.length} [post/min]\nall: ${allCursor.length} [post/min]`)
+    const date = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')} GMT+0900 (日本標準時)`
+    const text = `${date}\nからの1分間で受信したBlueskyの投稿数は以下の通りです\n\n日本語: ${jaCursor.length} [post/min]\n全投稿: ${allCursor.length} [post/min]`
+    await agent.post({text})
+    logger.info(text)
   })
 }

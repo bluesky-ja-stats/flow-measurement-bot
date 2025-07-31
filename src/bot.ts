@@ -3,6 +3,7 @@ import { CronJob } from 'cron'
 import { main } from './job'
 import { type AppContext, env } from './util/config'
 import { createLogger } from './util/logger'
+import { createDB } from './db'
 
 export class Bot {
   public agent: AtpAgent
@@ -18,11 +19,12 @@ export class Bot {
 
   static async create() {
     const logger = createLogger(['Runner', 'Bot'])
+		const db = await createDB()
     logger.info('Creating bot...')
 
     const agent = new AtpAgent({service: env.BLUESKY_SERVICE})
 
-    const job = new CronJob(env.CRON_SCHEDULE, async () => await main(agent, createLogger(['Runner', 'Bot', 'Job'])))
+    const job = new CronJob(env.CRON_SCHEDULE, async () => await main(agent, createLogger(['Runner', 'Bot', 'Job']), db))
 
     const ctx: AppContext = {
       logger,

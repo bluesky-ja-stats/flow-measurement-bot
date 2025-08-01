@@ -64,7 +64,7 @@ export const main = async (agent: AtpAgent, logger: Logger, db: Database): Promi
       for (const post of posts) if (isJa(post.record)) cursors.likes.ja.push(post.uri)
     }
     const d = new Date(cursors.all[0]/(10**3))
-    const text = `てすと\n\n測定開始: ${d.toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}\n測定時間: 1分\n\n日本語を含む投稿: ${cursors.posts.ja.length} [post/min]\n全ての投稿　　　: ${cursors.posts.all.length} [post/min]\n\n日本語を含む投稿へのいいね: ${cursors.likes.ja.length} [like/min]\n全てのいいね　　　　　　　: ${cursors.likes.all.length} [like/min]`
+    const text = `測定開始: ${d.toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}\n測定時間: 1分\n\n日本語を含む投稿: ${cursors.posts.ja.length} [post/min]\n全ての投稿　　　: ${cursors.posts.all.length} [post/min]\n\n日本語を含む投稿へのいいね: ${cursors.likes.ja.length} [like/min]\n全てのいいね　　　　　　　: ${cursors.likes.all.length} [like/min]`
 
     // DBに保存
     await db.insertInto('history').values({ created_at: d.toISOString(), like_all: cursors.likes.all.length, like_jp: cursors.likes.ja.length, post_all: cursors.posts.all.length, post_jp: cursors.posts.ja.length }).execute()

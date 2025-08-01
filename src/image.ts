@@ -57,8 +57,8 @@ export function generateDailyLikeImage(data: SelectHistory[]): imageData {
     type: 'line', data: {
       labels: data.map((d) => new Date(d.created_at).toLocaleTimeString('ja-JP', {hour: '2-digit', minute: '2-digit', timeZone: 'JST'})),
       datasets: [
-        { data: data.map(d => d.post_all), label: 'ALL', borderColor: 'blue', pointBackgroundColor: 'blue', yAxisID: 'yAll', backgroundColor: 'blue' },
-        { data: data.map(d => d.post_jp), label: 'JP', borderColor: 'red', pointBackgroundColor: 'red', yAxisID: 'yJP', backgroundColor: 'red' },
+        { data: data.map(d => d.like_all), label: 'ALL', borderColor: 'blue', pointBackgroundColor: 'blue', yAxisID: 'yAll', backgroundColor: 'blue' },
+        { data: data.map(d => d.like_jp), label: 'JP', borderColor: 'red', pointBackgroundColor: 'red', yAxisID: 'yJP', backgroundColor: 'red' },
       ],
     }, options: {
       font: { size: 50 },

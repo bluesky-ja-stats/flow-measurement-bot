@@ -20,4 +20,5 @@ export const env = cleanEnv(process.env, {
   BLUESKY_SERVICE: str(),
   BLUESKY_IDENTIFIER: str(),
   BLUESKY_PASSWORD: str(),
+  SQLITE_PATH: str(),
 })

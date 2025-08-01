@@ -3,8 +3,10 @@ import { WebSocket } from 'ws'
 import { JetstreamRecord, type JetstreamEvent } from './types'
 import { env } from './util/config'
 import { type Logger } from './util/logger'
+import type { Database } from './db'
+import { generateDailyImage } from './image'
 
-export const main = async (agent: AtpAgent, logger: Logger): Promise<void> => {
+export const main = async (agent: AtpAgent, logger: Logger, db: Database): Promise<void> => {
   const method = 'subscribe'
   const wantedCollections = ['app.bsky.feed.post', 'app.bsky.feed.like']
   const query = wantedCollections.map(v => 'wantedCollections='+v).join('&')
@@ -64,7 +66,16 @@ export const main = async (agent: AtpAgent, logger: Logger): Promise<void> => {
     const d = new Date(cursors.all[0]/(10**3))
     const date = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')} GMT+0900 (日本標準時)`
     const text = `測定開始: ${date}\n測定時間: 1分\n\n日本語を含む投稿: ${cursors.posts.ja.length} [post/min]\n全ての投稿　　　: ${cursors.posts.all.length} [post/min]\n\n日本語を含む投稿へのいいね: ${cursors.likes.ja.length} [like/min]\n全てのいいね　　　　　　　: ${cursors.likes.all.length} [like/min]`
-    await agent.post({text, langs: ['ja']})
+
+    // DBに保存
+    await db.insertInto("history").values({ created_at: d.toISOString(), like_all: cursors.likes.all.length, like_jp: cursors.likes.ja.length, post_all: cursors.posts.all.length, post_jp: cursors.posts.ja.length }).execute()
+
+    // DBからデータを取得しグラフを描画
+    const historyData = await db.selectFrom("history").selectAll().orderBy("created_at", "asc").limit(24).execute()
+    const { buffer: imageBuffer, width, height } = generateDailyImage(historyData)
+
+    const uploaded = await agent.uploadBlob(imageBuffer)
+    await agent.post({ text, langs: ['ja'], embed: { $type: "app.bsky.embed.images", images: [{ image: uploaded.data.blob, alt: "24時間のグラフ", $type: "app.bsky.embed.images#image", aspectRatio: { width, height } }] } })
     logger.info(text)
   })
 }

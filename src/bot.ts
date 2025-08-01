@@ -19,7 +19,7 @@ export class Bot {
 
   static async create() {
     const logger = createLogger(['Runner', 'Bot'])
-		const db = await createDB()
+    const db = await createDB()
     logger.info('Creating bot...')
 
     const agent = new AtpAgent({service: env.BLUESKY_SERVICE})

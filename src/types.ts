@@ -61,3 +61,12 @@ export interface JetstreamEventKindAccount {
     time: string
   }
 }
+
+export interface imageData {
+  title: string
+  buffer: Buffer
+  aspectRatio: {
+    width: number
+    height: number
+  }
+}

@@ -71,7 +71,7 @@ export const main = async (agent: AtpAgent, logger: Logger, db: Database): Promi
     await db.insertInto("history").values({ created_at: d.toISOString(), like_all: cursors.likes.all.length, like_jp: cursors.likes.ja.length, post_all: cursors.posts.all.length, post_jp: cursors.posts.ja.length }).execute()
 
     // DBからデータを取得しグラフを描画
-    const historyData = await db.selectFrom("history").selectAll().orderBy("created_at", "desc").limit(24).execute()
+    const historyData = await db.selectFrom("history").selectAll().orderBy("created_at", "asc").limit(24).execute()
     const { buffer: imageBuffer, width, height } = generateDailyImage(historyData)
 
     const uploaded = await agent.uploadBlob(imageBuffer)

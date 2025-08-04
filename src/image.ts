@@ -15,7 +15,7 @@ Chart.register([{
 }])
 
 export function generateDailyPostImage(data: SelectHistory[]): imageData {
-  const title = `24-hour Post per Minute / ${new Date(data[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})} ~`
+  const title = `24-hour Post per Minute / ${new Date(data[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})} ~ ${new Date(data.slice(-1)[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}`
   const width = 1280
   const height = 720
   const canvas = createCanvas(width, height)
@@ -47,7 +47,7 @@ export function generateDailyPostImage(data: SelectHistory[]): imageData {
 }
 
 export function generateDailyLikeImage(data: SelectHistory[]): imageData {
-  const title = `24-hour Like per Minute / ${new Date(data[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})} ~`
+  const title = `24-hour Like per Minute / ${new Date(data[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})} ~ ${new Date(data.slice(-1)[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}`
   const width = 1280
   const height = 720
   const canvas = createCanvas(width, height)
@@ -67,9 +67,73 @@ export function generateDailyLikeImage(data: SelectHistory[]): imageData {
         legend: {position: 'bottom', labels: {font: {size: 30}}},
       },
       scales: {
-        yAll: { position: 'left', min: 0, suggestedMax: 20000, ticks: { font: { size: 16 } }, title: { text: 'All  [like/min]', display: true, padding: 5, font: { size: 20 } }, },
-        yJP: { position: 'right', min: 0, suggestedMax: 2000, ticks: { font: { size: 16 } }, title: { text: 'JP  [like/min]', display: true, padding: 5, font: { size: 20 }, }, },
+        yAll: { position: 'left', min: 0, suggestedMax: 30000, ticks: { font: { size: 16 } }, title: { text: 'All  [like/min]', display: true, padding: 5, font: { size: 20 } }, },
+        yJP: { position: 'right', min: 0, suggestedMax: 3000, ticks: { font: { size: 16 } }, title: { text: 'JP  [like/min]', display: true, padding: 5, font: { size: 20 }, }, },
         x: { ticks: { font: { size: 18, }, autoSkip: true, maxRotation: 0 } }
+      },
+    },
+  })
+
+  const buffer = canvas.toBuffer('image/png')
+  return { title, buffer, aspectRatio: {width, height}}
+}
+
+export function generateWeeklyPostImage(data: SelectHistory[]): imageData {
+  const title = `One-week Post per Minute / ${new Date(data[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})} ~ ${new Date(data.slice(-1)[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}`
+  const width = 1280
+  const height = 720
+  const canvas = createCanvas(width, height)
+  const context = canvas.getContext('2d')
+
+  new Chart(context, {
+    type: 'line', data: {
+      labels: data.map((d) => new Date(d.created_at).toLocaleString('ja-JP', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'JST'})),
+      datasets: [
+        { data: data.map(d => d.post_all), label: 'ALL', borderColor: 'blue', pointBackgroundColor: 'blue', yAxisID: 'yAll', backgroundColor: 'blue' },
+        { data: data.map(d => d.post_jp), label: 'JP', borderColor: 'red', pointBackgroundColor: 'red', yAxisID: 'yJP', backgroundColor: 'red' },
+      ],
+    }, options: {
+      font: { size: 50 },
+      plugins: {
+        title: {display: true, text: title, font: {size: 20}},
+        legend: {position: 'bottom', labels: {font: {size: 30}}},
+      },
+      scales: {
+        yAll: { position: 'left', min: 0, suggestedMax: 8000, ticks: { font: { size: 16 } }, title: { text: 'All  [post/min]', display: true, padding: 5, font: { size: 20 } }, },
+        yJP: { position: 'right', min: 0, suggestedMax: 800, ticks: { font: { size: 16 } }, title: { text: 'JP  [post/min]', display: true, padding: 5, font: { size: 20 }, }, },
+        x: { ticks: { font: { size: 18, }, autoSkip: true, maxRotation: 30 } }
+      },
+    },
+  })
+
+  const buffer = canvas.toBuffer('image/png')
+  return { title, buffer, aspectRatio: {width, height}}
+}
+
+export function generateWeeklyLikeImage(data: SelectHistory[]): imageData {
+  const title = `One-week Like per Minute / ${new Date(data[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})} ~ ${new Date(data.slice(-1)[0].created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}`
+  const width = 1280
+  const height = 720
+  const canvas = createCanvas(width, height)
+  const context = canvas.getContext('2d')
+
+  new Chart(context, {
+    type: 'line', data: {
+      labels: data.map((d) => new Date(d.created_at).toLocaleString('ja-JP', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'JST'})),
+      datasets: [
+        { data: data.map(d => d.like_all), label: 'ALL', borderColor: 'blue', pointBackgroundColor: 'blue', yAxisID: 'yAll', backgroundColor: 'blue' },
+        { data: data.map(d => d.like_jp), label: 'JP', borderColor: 'red', pointBackgroundColor: 'red', yAxisID: 'yJP', backgroundColor: 'red' },
+      ],
+    }, options: {
+      font: { size: 50 },
+      plugins: {
+        title: {display: true, text: title, font: {size: 20}},
+        legend: {position: 'bottom', labels: {font: {size: 30}}},
+      },
+      scales: {
+        yAll: { position: 'left', min: 0, suggestedMax: 30000, ticks: { font: { size: 16 } }, title: { text: 'All  [like/min]', display: true, padding: 5, font: { size: 20 } }, },
+        yJP: { position: 'right', min: 0, suggestedMax: 3000, ticks: { font: { size: 16 } }, title: { text: 'JP  [like/min]', display: true, padding: 5, font: { size: 20 }, }, },
+        x: { ticks: { font: { size: 18, }, autoSkip: true, maxRotation: 30 } }
       },
     },
   })

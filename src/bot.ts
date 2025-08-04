@@ -1,6 +1,6 @@
 import { AtpAgent } from '@atproto/api'
 import { CronJob } from 'cron'
-import { main } from './job'
+import { hourly, weekly } from './job'
 import { type AppContext, env } from './util/config'
 import { createLogger } from './util/logger'
 import { createDB } from './db'
@@ -24,11 +24,13 @@ export class Bot {
 
     const agent = new AtpAgent({service: env.BLUESKY_SERVICE})
 
-    const job = new CronJob(env.CRON_SCHEDULE, async () => await main(agent, createLogger(['Runner', 'Bot', 'Job']), db))
+    const hourlyJob = new CronJob('0 0 * * * *', async () => await hourly(agent, createLogger(['Runner', 'Bot', 'HourlyJob']), db))
+    const weeklyJob = new CronJob('0 0 0 * * 1', async () => await weekly(agent, createLogger(['Runner', 'Bot', 'WeeklyJob']), db))
 
     const ctx: AppContext = {
       logger,
-      job,
+      hourlyJob,
+      weeklyJob,
     }
 
     logger.info('Bot has been created!')
@@ -42,13 +44,15 @@ export class Bot {
       identifier: env.BLUESKY_IDENTIFIER,
       password: env.BLUESKY_PASSWORD,
     })
-    this.ctx.job.start()
+    this.ctx.hourlyJob.start()
+    this.ctx.weeklyJob.start()
     this.ctx.logger.info('Bot started')
   }
 
   async stop() {
     this.ctx.logger.info('Stopping bot...')
-    await this.ctx.job.stop()
+    await this.ctx.hourlyJob.stop()
+    await this.ctx.weeklyJob.stop()
     await this.agent.logout()
     this.ctx.logger.info('Bot stopped')
   }

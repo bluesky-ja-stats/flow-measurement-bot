@@ -79,7 +79,7 @@ export const hourly = async (agent: AtpAgent, logger: Logger, db: Database): Pro
     const d = new Date(cursors.all[0]/(10**3))
 
     // DBに保存
-    await db.insertInto('history').values({ created_at: d.toISOString(), like_all: cursors.likes.all.length, like_jp: cursors.likes.ja.length, post_all: cursors.posts.all.length, post_jp: cursors.posts.ja.length }).execute()
+    await db.insertInto('history').values({ created_at: d.toISOString(), like_all: cursors.likes.all.length*60/measureSecond, like_jp: cursors.likes.ja.length*60/measureSecond, post_all: cursors.posts.all.length*60/measureSecond, post_jp: cursors.posts.ja.length*60/measureSecond }).execute()
 
     // DBからデータを取得しグラフを描画
     const historyData = (await db.selectFrom('history').selectAll().orderBy('created_at', 'desc').limit(24).execute()).reverse()
@@ -88,7 +88,7 @@ export const hourly = async (agent: AtpAgent, logger: Logger, db: Database): Pro
     images.push(await generateImageLex(agent, generateDailyPostImage(historyData)))
     images.push(await generateImageLex(agent, generateDailyLikeImage(historyData)))
 
-    const text = `【測定データ】\n\n測定開始: ${d.toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}\n測定時間: ${measureSecond}秒\n\n日本語を含む投稿: ${cursors.posts.ja.length} [post/min]\n全ての投稿　　　: ${cursors.posts.all.length} [post/min]\n\n日本語を含む投稿へのいいね: ${cursors.likes.ja.length} [like/min]\n全てのいいね　　　　　　　: ${cursors.likes.all.length} [like/min]`
+    const text = `【測定データ】\n\n測定開始: ${d.toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}\n測定時間: ${measureSecond}秒\n\n日本語を含む投稿: ${cursors.posts.ja.length*60/measureSecond} [post/min]\n全ての投稿　　　: ${cursors.posts.all.length*60/measureSecond} [post/min]\n\n日本語を含む投稿へのいいね: ${cursors.likes.ja.length*60/measureSecond} [like/min]\n全てのいいね　　　　　　　: ${cursors.likes.all.length*60/measureSecond} [like/min]`
     await agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja'], embed: {$type: 'app.bsky.embed.images', images}})
     logger.info(text)
   })

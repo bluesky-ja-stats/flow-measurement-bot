@@ -1,6 +1,6 @@
 import { AtpAgent, type AppBskyEmbedImages } from '@atproto/api'
 import { WebSocket } from 'ws'
-import type { imageData, JetstreamEvent } from './types'
+import type { Cursors, imageData, JetstreamEvent } from './types'
 import { env } from './util/config'
 import { type Logger } from './util/logger'
 import type { Database } from './db'
@@ -19,17 +19,7 @@ export const hourly = async (agent: AtpAgent, logger: Logger, db: Database): Pro
   const wantedCollections = ['app.bsky.feed.post', 'app.bsky.feed.like']
   const query = wantedCollections.map(v => 'wantedCollections='+v).join('&')
   const url = `${env.JETSTREAM_ENDPOINT}/${method}?${query}`
-  const cursors: {
-    all: number[]
-    posts: {
-      all: number[]
-      ja: number[]
-    }
-    likes: {
-      all: string[]
-      ja: string[]
-    }
-  } = {
+  const cursors: Cursors = {
     all: [],
     posts: {
       all: [],
@@ -73,8 +63,7 @@ export const hourly = async (agent: AtpAgent, logger: Logger, db: Database): Pro
     logger.debug('close処理')
     const maxUriSize = 25
     for (const sepLikes of cursors.likes.all.flatMap((_, i, a) => i % maxUriSize ? [] : [a.slice(i, i + maxUriSize)])) {
-      const posts = (await agent.getPosts({uris: sepLikes})).data.posts
-      for (const post of posts) if (isJa(post.record)) cursors.likes.ja.push(post.uri)
+      await getPosts(agent, logger, cursors, sepLikes)
     }
     const d = new Date(cursors.all[0]/(10**3))
 
@@ -106,6 +95,16 @@ export const weekly = async (agent: AtpAgent, logger: Logger, db: Database): Pro
   const text = `【週間報告】\n\n${new Date(historyData[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} ~ ${new Date(historyData.slice(-1)[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})}\nにおける、投稿といいねの流速のグラフです。`
   await agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja'], embed: {$type: 'app.bsky.embed.images', images}})
   logger.info(text)
+}
+
+const getPosts = async (agent: AtpAgent, logger: Logger, cursors: Cursors, uris: string[]): Promise<void> => {
+  try {
+    const posts = (await agent.getPosts({uris})).data.posts
+    for (const post of posts) if (isJa(post.record)) cursors.likes.ja.push(post.uri)
+  } catch {
+    logger.error('AtpAgent could not get posts')
+    await getPosts(agent, logger, cursors, uris)
+  }
 }
 
 const isJa = (record: any): boolean => {

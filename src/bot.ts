@@ -19,8 +19,10 @@ export class Bot {
 
   static async create() {
     const logger = createLogger(['Runner', 'Bot'])
-    const db = await createDB()
     logger.info('Creating bot...')
+
+    logger.info(`Creating DB => ${env.SQLITE_PATH}`)
+    const db = await createDB()
 
     const agent = new AtpAgent({service: env.BLUESKY_SERVICE})
 
@@ -44,6 +46,7 @@ export class Bot {
       identifier: env.BLUESKY_IDENTIFIER,
       password: env.BLUESKY_PASSWORD,
     })
+    this.ctx.logger.info(`✓  Signed in as @${(await this.agent.getProfile({actor: this.agent.assertDid})).data.handle}`)
     this.ctx.hourlyJob.start()
     this.ctx.weeklyJob.start()
     this.ctx.logger.info('Bot started')

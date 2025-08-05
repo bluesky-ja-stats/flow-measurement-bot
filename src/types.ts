@@ -62,6 +62,18 @@ export interface JetstreamEventKindAccount {
   }
 }
 
+export interface Cursors {
+  all: number[]
+  posts: {
+    all: number[]
+    ja: number[]
+  }
+  likes: {
+    all: string[]
+    ja: string[]
+  }
+}
+
 export interface imageData {
   title: string
   buffer: Buffer

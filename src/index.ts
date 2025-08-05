@@ -1,3 +1,5 @@
+console.log('Starting...')
+
 import { Bot } from './bot'
 import { env } from './util/config'
 import { createLogger } from './util/logger'

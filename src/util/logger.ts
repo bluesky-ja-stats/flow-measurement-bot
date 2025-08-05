@@ -1,8 +1,19 @@
+import fs from 'fs'
+import path from 'path'
 import { env } from './config'
 
-const generateLogMessage = (level: string, childs: string[], message: string): string[] => {
-  const date: Date = new Date(Date.now())
-  const dateString: string = date.toISOString().replace('T',' ').replace('Z','')
+process.stdout.write('Setting up logging file...')
+const logDirName = 'logs'
+if (!fs.existsSync(logDirName)) fs.mkdirSync(logDirName, {recursive: true})
+const logFilePath = path.join(logDirName, `${new Date().toISOString().replaceAll(':','-').replace('.',',')}.txt`)
+const logWriteStream = fs.createWriteStream(path.resolve(logFilePath), {encoding: 'utf8', flags: 'wx'})
+const writeLog = (text: string) => {
+  logWriteStream.write(`${text}\n`)
+}
+console.log(`\rSetting up logging file => ${logFilePath}`)
+
+const generateLogMessage = (level: string, levelColor: string, childs: string[], message: string): {text: string, log: string} => {
+  const dateString: string = new Date().toISOString().replace('T',' ').replace('Z','')
   let prefixString: string = `${dateString} ${`[${level}]`.padEnd(8, ' ')}`
   for (const child of childs) {
     prefixString += `[${child}]: `
@@ -20,7 +31,10 @@ const generateLogMessage = (level: string, childs: string[], message: string): s
   for (const child of childs) {
     childString += `[\x1b[32m${child}\x1b[0m]: `
   }
-  return [`\x1b[90m${dateString}\x1b[0m [`, `${`${level}\u001b[0m]`.padEnd(10, ' ')} ${childString}${messageString}`]
+  return {
+    text: `${prefixString}${messageString}`,
+    log: `\x1b[90m${dateString}\x1b[0m [${levelColor}${`${level}\u001b[0m]`.padEnd(10, ' ')} ${childString}${messageString}`
+  }
 }
 
 export interface Logger {
@@ -33,16 +47,28 @@ export interface Logger {
 export const createLogger = (childs: string[]): Logger => {
   return {
     debug: (message: string): void => {
-      if (!env.isProduction) console.debug(generateLogMessage('DEBUG', childs, message).join('\u001b[35m'))
+      const {text, log} = generateLogMessage('DEBUG', '\u001b[35m', childs, message)
+      if (!env.isProduction) {
+        console.debug(log)
+        writeLog(text)
+      }
     },
     info: (message: string): void => {
-      console.info(generateLogMessage('INFO', childs, message).join('\u001b[36m'))
+      const {text, log} = generateLogMessage('INFO', '\u001b[36m', childs, message)
+      console.info(log)
+      writeLog(text)
     },
     warn: (message: string): void => {
-      console.warn(generateLogMessage('WARN', childs, message).join('\u001b[33m'))
+      const {text, log} = generateLogMessage('WARN', '\u001b[33m', childs, message)
+      console.warn(log)
+      writeLog(text)
     },
     error: (message: string): void => {
-      console.error(generateLogMessage('ERROR', childs, message).join('\u001b[31m'))
+      const {text, log} = generateLogMessage('ERROR', '\u001b[31m', childs, message)
+      console.error(log)
+      writeLog(text)
     }
   }
 }
+
+process.on('exit', () => logWriteStream.end())

@@ -106,7 +106,19 @@ export const daily = async (ctx: AppContext): Promise<void> => {
   const targetDayIndex = dates.indexOf(targetDay)
 
   if (targetDayIndex <= 0) {
-    const text = `【測定データ】\n\n測定対象: ${targetDay}\n\n先日の[poster/day]の算出は、データが少ないためスキップしました。`
+    const historyPosterTable: HistoryPosterTable = {
+      created_at: targetDay,
+      all: posters.all[targetDay].length,
+      all_increase: 0,
+      all_decrease: 0,
+      jp: posters.jp[targetDay].length,
+      jp_increase: 0,
+      jp_decrease: 0,
+    }
+
+    await ctx.db.insertInto('history_poster').values(historyPosterTable).execute()
+
+    const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp} [poster/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase} [poster/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease} [poster/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all} [poster/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase} [poster/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease} [poster/day]`
     await ctx.agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja']})
     ctx.logger.info(text)
     return

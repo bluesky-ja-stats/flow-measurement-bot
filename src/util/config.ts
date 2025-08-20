@@ -1,12 +1,13 @@
-import { CronJob } from 'cron'
 import dotenv from 'dotenv'
 import { cleanEnv, str, testOnly } from 'envalid'
+import AtpAgent from '@atproto/api'
+import { type Database } from '../db'
 import { type Logger } from './logger'
 
 export interface AppContext {
+  agent: AtpAgent
+  db: Database
   logger: Logger
-  hourlyJob: CronJob
-  weeklyJob: CronJob
 }
 
 dotenv.config()

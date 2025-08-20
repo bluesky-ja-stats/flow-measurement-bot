@@ -1,5 +1,5 @@
+import { Chart } from 'chart.js/auto'
 import { createCanvas } from '@napi-rs/canvas'
-import { Chart, } from 'chart.js/auto'
 import type { SelectHistory } from './db/types'
 import type { imageData } from './types'
 

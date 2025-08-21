@@ -19,9 +19,9 @@ const run = async () => {
 
   setupCmd(bot, createLogger(['Runner', 'Commander']))
 
-  process.on('SIGHUP', closeSignal)
-  process.on('SIGINT', closeSignal)
-  process.on('SIGTERM', closeSignal)
+  process.on('SIGHUP', async () => await closeSignal(bot, logger))
+  process.on('SIGINT', async () => await closeSignal(bot, logger))
+  process.on('SIGTERM', async () => await closeSignal(bot, logger))
 }
 
 run()

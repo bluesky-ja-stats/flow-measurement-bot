@@ -1,6 +1,8 @@
 console.log('Starting...')
 
 import { Bot } from './bot'
+import { setupCmd } from './cmd'
+import { closeSignal } from './cmds/stop'
 import { env } from './util/config'
 import { createLogger } from './util/logger'
 
@@ -15,20 +17,7 @@ const run = async () => {
   await bot.start()
   logger.info('Done!')
 
-  const closeSignal = async () => {
-    logger.debug('Recieved closeSignal!')
-    setTimeout(() => process.exit(1), 10000).unref()
-    await bot.stop()
-    process.stdout.write('\r\x1b[2K')
-    process.exit(0)
-  }
-
-  process.stdin.on('data', (data) => {
-    const cmd = (data.toString()).slice(0, -1)
-    if (cmd === 'stop') {
-      closeSignal()
-    } else logger.error(`"${cmd}": command not found`)
-  })
+  setupCmd(bot, createLogger(['Runner', 'Commander']))
 
   process.on('SIGHUP', closeSignal)
   process.on('SIGINT', closeSignal)

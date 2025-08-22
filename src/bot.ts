@@ -79,6 +79,7 @@ export class Bot {
     
     const hourlyJob = new CronJob('0 0 * * * *', async () => await hourly({...ctx, logger: createLogger(['Runner', 'Bot', 'HourlyJob'])}))
     const dailyJob = new CronJob('1 0 0 * * *', async () => await daily({...ctx, logger: createLogger(['Runner', 'Bot', 'DailyJob'])}))
+    //前日の量が半分の場合、8秒
     const weeklyJob = new CronJob('10 0 0 * * 1', async () => await weekly({...ctx, logger: createLogger(['Runner', 'Bot', 'WeeklyJob'])}))
     //const monthlyJob = new CronJob('0 0 * * * *', async () => await monthly({...ctx, logger: createLogger(['Runner', 'Bot', 'MonthlyJob'])}))
 

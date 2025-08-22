@@ -1,8 +1,8 @@
 console.log('Starting...')
 
 import { Bot } from './bot'
-import { setupCmd } from './cmd'
 import { closeSignal } from './cmds/stop'
+import { setupCmd } from './util/cmd'
 import { env } from './util/config'
 import { createLogger } from './util/logger'
 

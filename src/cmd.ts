@@ -4,6 +4,7 @@ import { Bot } from "./bot"
 import { createLogger, Logger } from "./util/logger"
 
 export const setupCmd = (bot: Bot, logger: Logger) => {
+  logger.info('Registering command...')
   process.stdin.on('data', async (data) => {
     const cmd = (data.toString()).split(' ').map(v => v.trim()).filter(v => v !== '')
     for (let i = cmd.length; i > 0; i--) {
@@ -16,4 +17,5 @@ export const setupCmd = (bot: Bot, logger: Logger) => {
     }
     logger.error(`command not found`)
   })
+  logger.info('Commands has been registered!')
 }

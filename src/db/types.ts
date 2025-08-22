@@ -26,7 +26,7 @@ export interface HistoryPosterTable {
 
 export interface TmpPosterTable {
   date_did: string
-  is_jp: string
+  is_jp: 'true' | 'false'
 }
 
 export type SelectHistory = Selectable<HistoryTable>

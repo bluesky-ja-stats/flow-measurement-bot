@@ -12,10 +12,10 @@ export interface Cursors {
 
 export interface Posters {
   all: {
-    [date: string]: string[] //Set<string>
+    [date: string]: Set<string>
   }
   jp: {
-    [date: string]: string[] //Set<string>
+    [date: string]: Set<string>
   }
 }
 

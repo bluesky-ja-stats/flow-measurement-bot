@@ -79,7 +79,7 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
     images.push(await generateImageLex(ctx.agent, generateDailyPostImage(historyData)))
     images.push(await generateImageLex(ctx.agent, generateDailyLikeImage(historyData)))
 
-    const text = `【測定データ】\n\n測定対象: ${d.toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}\n測定時間: ${measureSecond}秒\n\n日本語を含む投稿: ${cursors.posts.ja.length*60/measureSecond} [post/min]\n全ての投稿　　　: ${cursors.posts.all.length*60/measureSecond} [post/min]\n\n日本語を含む投稿へのいいね: ${cursors.likes.ja.length*60/measureSecond} [like/min]\n全てのいいね　　　　　　　: ${cursors.likes.all.length*60/measureSecond} [like/min]`
+    const text = `【測定データ】\n\n測定対象: ${d.toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}\n測定時間: ${measureSecond.toLocaleString('ja-JP')}秒\n\n日本語を含む投稿: ${(cursors.posts.ja.length*60/measureSecond).toLocaleString('ja-JP')} [post/min]\n全ての投稿　　　: ${(cursors.posts.all.length*60/measureSecond).toLocaleString('ja-JP')} [post/min]\n\n日本語を含む投稿へのいいね: ${(cursors.likes.ja.length*60/measureSecond).toLocaleString('ja-JP')} [like/min]\n全てのいいね　　　　　　　: ${(cursors.likes.all.length*60/measureSecond).toLocaleString('ja-JP')} [like/min]`
     await ctx.agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja'], embed: {$type: 'app.bsky.embed.images', images}})
     ctx.logger.info(text)
   })
@@ -90,15 +90,15 @@ export const daily = async (ctx: AppContext): Promise<void> => {
 
   const posters: Posters = {all: {}, jp: {}}
   const tmpPosterData = await ctx.db.selectFrom('tmp_poster').selectAll().execute()
-  for (const poster of tmpPosterData) {
+  const len = tmpPosterData.length
+  for (let i = 0; i < len; i++) {
+    const poster = tmpPosterData[i]
     const [date, did] = poster.date_did.split('=')
-    if (!Array.isArray(posters.all[date])) posters.all[date] = [] //new Set()
-    //posters.all[date].add(did)
-    posters.all[date].push(did)
+    if (!posters.all[date]) posters.all[date] = new Set<string>()
+    posters.all[date].add(did)
     if (poster.is_jp === 'true') {
-      if (!Array.isArray(posters.jp[date])) posters.jp[date] = [] //new Set()
-      //posters.jp[date].add(did)
-      posters.jp[date].push(did)
+      if (!posters.jp[date]) posters.jp[date] = new Set<string>()
+      posters.jp[date].add(did)
     }
   }
   const dates = Object.keys(posters.all).sort()
@@ -108,45 +108,30 @@ export const daily = async (ctx: AppContext): Promise<void> => {
   if (targetDayIndex <= 0) {
     const historyPosterTable: HistoryPosterTable = {
       created_at: targetDay,
-      all: posters.all[targetDay].length,
+      all: posters.all[targetDay].size,
       all_increase: 0,
       all_decrease: 0,
-      jp: posters.jp[targetDay].length,
+      jp: posters.jp[targetDay].size,
       jp_increase: 0,
       jp_decrease: 0,
     }
 
     await ctx.db.insertInto('history_poster').values(historyPosterTable).execute()
 
-    const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp} [poster/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase} [poster/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease} [poster/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all} [poster/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase} [poster/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease} [poster/day]`
+    const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp.toLocaleString('ja-JP')} [poster/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase.toLocaleString('ja-JP')} [poster/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease.toLocaleString('ja-JP')} [poster/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all.toLocaleString('ja-JP')} [poster/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase.toLocaleString('ja-JP')} [poster/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease.toLocaleString('ja-JP')} [poster/day]`
     await ctx.agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja']})
     ctx.logger.info(text)
     return
   }
 
-  /*const historyPosterTable: HistoryPosterTable = {
-    created_at: targetDay,
-    all: posters.all[targetDay].size,
-    all_increase: posters.all[targetDay].difference(posters.all[dates[targetDayIndex-1]]),
-    all_decrease: posters.all[dates[targetDayIndex-1]].difference(posters.all[targetDay]),
-    jp: posters.jp[targetDay].size,
-    jp_increase: posters.jp[targetDay].difference(posters.jp[dates[targetDayIndex-1]]),
-    jp_decrease: posters.jp[dates[targetDayIndex-1]].difference(posters.jp[targetDay]),
-  }*/
-
-  const all_increase = posters.all[targetDay].filter((v) => !posters.all[dates[targetDayIndex-1]].includes(v)).length
-  const all_decrease = posters.all[dates[targetDayIndex-1]].filter((v) => !posters.all[targetDay].includes(v)).length
-  const jp_increase = posters.jp[targetDay].filter((v) => !posters.jp[dates[targetDayIndex-1]].includes(v)).length
-  const jp_decrease = posters.jp[dates[targetDayIndex-1]].filter((v) => !posters.jp[targetDay].includes(v)).length
-
   const historyPosterTable: HistoryPosterTable = {
     created_at: targetDay,
-    all: posters.all[targetDay].length,
-    all_increase,
-    all_decrease,
-    jp: posters.jp[targetDay].length,
-    jp_increase,
-    jp_decrease,
+    all: posters.all[targetDay].size,
+    all_increase: getDifference(posters.all[targetDay], posters.all[dates[targetDayIndex-1]]).size,
+    all_decrease: getDifference(posters.all[dates[targetDayIndex-1]], posters.all[targetDay]).size,
+    jp: posters.jp[targetDay].size,
+    jp_increase: getDifference(posters.jp[targetDay], posters.jp[dates[targetDayIndex-1]]).size,
+    jp_decrease: getDifference(posters.jp[dates[targetDayIndex-1]], posters.jp[targetDay]).size,
   }
 
   await ctx.db.insertInto('history_poster').values(historyPosterTable).execute()
@@ -155,7 +140,7 @@ export const daily = async (ctx: AppContext): Promise<void> => {
     await ctx.db.deleteFrom('tmp_poster').where('date_did', 'like', `${deleteDay}=%`).execute()
   }
 
-  const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp} [poster/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase} [poster/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease} [poster/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all} [poster/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase} [poster/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease} [poster/day]`
+  const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp.toLocaleString('ja-JP')} [poster/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase.toLocaleString('ja-JP')} [poster/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease.toLocaleString('ja-JP')} [poster/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all.toLocaleString('ja-JP')} [poster/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase.toLocaleString('ja-JP')} [poster/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease.toLocaleString('ja-JP')} [poster/day]`
   await ctx.agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja']})
   ctx.logger.info(text)
 }
@@ -199,4 +184,10 @@ export const isJa = (record: any): boolean => {
 const generateImageLex = async (agent: AtpAgent, imageData: imageData): Promise<AppBskyEmbedImages.Image> => {
   const uploaded = await agent.uploadBlob(imageData.buffer)
   return {$type: 'app.bsky.embed.images#image', image: uploaded.data.blob, aspectRatio: {...imageData.aspectRatio}, alt: imageData.title}
+}
+
+const getDifference = (a: Set<string>, b: Set<string>): Set<string> => {
+  return new Set(
+    [...a].filter(v => !b.has(v))
+  )
 }

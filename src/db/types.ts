@@ -30,3 +30,5 @@ export interface TmpPosterTable {
 }
 
 export type SelectHistory = Selectable<HistoryTable>
+
+export type SelectPosterHistory = Selectable<HistoryPosterTable>

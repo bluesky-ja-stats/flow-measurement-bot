@@ -3,6 +3,8 @@ import { WebSocket } from 'ws'
 import { AtpAgent, type AppBskyEmbedImages } from '@atproto/api'
 import { HistoryPosterTable } from './db/types'
 import {
+  generateAllPosterImage,
+  generateJpPosterImage,
   generateDailyPostImage,
   generateDailyLikeImage,
   generateWeeklyPostImage,
@@ -149,12 +151,47 @@ export const weekly = async (ctx: AppContext): Promise<void> => {
   ctx.logger.info('Start weekly job')
 
   const historyData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').limit(7*24).execute()).reverse()
+  const historyPosterData = (await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'desc').limit(7).execute()).reverse()
 
   const images: AppBskyEmbedImages.Image[] = []
   images.push(await generateImageLex(ctx.agent, generateWeeklyPostImage(historyData)))
   images.push(await generateImageLex(ctx.agent, generateWeeklyLikeImage(historyData)))
+  images.push(await generateImageLex(ctx.agent, generateJpPosterImage('One-week', historyPosterData)))
+  images.push(await generateImageLex(ctx.agent, generateAllPosterImage('One-week', historyPosterData)))
 
-  const text = `【週間報告】\n\n${new Date(historyData[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} ~ ${new Date(historyData.slice(-1)[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})}\nにおける、投稿といいねの流速のグラフです。`
+  const text = `【週間報告】\n\n${new Date(historyData[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} ~ ${new Date(historyData.slice(-1)[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} における、投稿といいねの流速のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における、投稿者の増減のグラフです。`
+  await ctx.agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja'], embed: {$type: 'app.bsky.embed.images', images}})
+  ctx.logger.info(text)
+}
+
+export const monthly = async (ctx: AppContext): Promise<void> => {
+  ctx.logger.info('Start monthly job')
+
+  const targetDay = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})
+
+  const historyPosterData = (await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'desc').where('created_at', 'like', `${targetDay.split('-').slice(0, 2).join('-')}-%`).execute()).reverse()
+
+  const images: AppBskyEmbedImages.Image[] = []
+  images.push(await generateImageLex(ctx.agent, generateJpPosterImage('One-month', historyPosterData)))
+  images.push(await generateImageLex(ctx.agent, generateAllPosterImage('One-month', historyPosterData)))
+
+  const text = `【月間報告】\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における、投稿者の増減のグラフです。`
+  await ctx.agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja'], embed: {$type: 'app.bsky.embed.images', images}})
+  ctx.logger.info(text)
+}
+
+export const yearly = async (ctx: AppContext): Promise<void> => {
+  ctx.logger.info('Start yearly job')
+
+  const targetDay = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})
+
+  const historyPosterData = (await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'desc').where('created_at', 'like', `${targetDay.split('-')[0]}-%`).execute()).reverse()
+
+  const images: AppBskyEmbedImages.Image[] = []
+  images.push(await generateImageLex(ctx.agent, generateJpPosterImage('One-year', historyPosterData)))
+  images.push(await generateImageLex(ctx.agent, generateAllPosterImage('One-year', historyPosterData)))
+
+  const text = `【年間報告】\n\n\\\\\\ Happy New Year ///\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における、投稿者の増減のグラフです。`
   await ctx.agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja'], embed: {$type: 'app.bsky.embed.images', images}})
   ctx.logger.info(text)
 }

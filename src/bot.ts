@@ -3,7 +3,7 @@ import { CronJob } from 'cron'
 import { AtpAgent } from '@atproto/api'
 import { IdResolver } from '@atproto/identity'
 import { createDB, migrateToLatest } from './db'
-import { isJa, hourly, daily, weekly, /*monthly*/ } from './job'
+import { isJa, hourly, daily, weekly, monthly, yearly } from './job'
 import { type AppContext, env } from './util/config'
 import { createLogger } from './util/logger'
 
@@ -13,19 +13,25 @@ export class Bot {
   public hourlyJob: CronJob
   public dailyJob: CronJob
   public weeklyJob: CronJob
+  public monthlyJob: CronJob
+  public yearlyJob: CronJob
 
   constructor(
     ctx: AppContext,
     jetstream: Jetstream,
     hourlyJob: CronJob,
     dailyJob: CronJob,
-    weeklyJob: CronJob
+    weeklyJob: CronJob,
+    monthlyJob: CronJob,
+    yearlyJob: CronJob
   ) {
     this.ctx = ctx
     this.jetstream = jetstream
     this.hourlyJob = hourlyJob
     this.dailyJob = dailyJob
     this.weeklyJob = weeklyJob
+    this.monthlyJob = monthlyJob
+    this.yearlyJob = yearlyJob
   }
 
   static async create() {
@@ -79,13 +85,13 @@ export class Bot {
     
     const hourlyJob = new CronJob('0 0 * * * *', async () => await hourly({...ctx, logger: createLogger(['Runner', 'Bot', 'HourlyJob'])}))
     const dailyJob = new CronJob('1 0 0 * * *', async () => await daily({...ctx, logger: createLogger(['Runner', 'Bot', 'DailyJob'])}))
-    //前日の量が半分の場合、8秒
-    const weeklyJob = new CronJob('10 0 0 * * 1', async () => await weekly({...ctx, logger: createLogger(['Runner', 'Bot', 'WeeklyJob'])}))
-    //const monthlyJob = new CronJob('0 0 * * * *', async () => await monthly({...ctx, logger: createLogger(['Runner', 'Bot', 'MonthlyJob'])}))
+    const weeklyJob = new CronJob('0 1 0 * * 1', async () => await weekly({...ctx, logger: createLogger(['Runner', 'Bot', 'WeeklyJob'])}))
+    const monthlyJob = new CronJob('0 1 0 1 * *', async () => await monthly({...ctx, logger: createLogger(['Runner', 'Bot', 'MonthlyJob'])}))
+    const yearlyJob = new CronJob('0 1 0 1 1 *', async () => await yearly({...ctx, logger: createLogger(['Runner', 'Bot', 'YearlyJob'])}))
 
     logger.info('Bot has been created!')
 
-    return new Bot(ctx, jetstream, hourlyJob, dailyJob, weeklyJob)
+    return new Bot(ctx, jetstream, hourlyJob, dailyJob, weeklyJob, monthlyJob, yearlyJob)
   }
 
   async start() {
@@ -100,6 +106,8 @@ export class Bot {
     this.hourlyJob.start()
     this.dailyJob.start()
     this.weeklyJob.start()
+    this.monthlyJob.start()
+    this.yearlyJob.start()
     this.ctx.logger.info('Bot started')
   }
 
@@ -108,6 +116,8 @@ export class Bot {
     await this.hourlyJob.stop()
     await this.dailyJob.stop()
     await this.weeklyJob.stop()
+    await this.monthlyJob.stop()
+    await this.yearlyJob.stop()
     await this.jetstream.destroy()
     await this.ctx.agent.logout()
     this.ctx.logger.info('Bot stopped')

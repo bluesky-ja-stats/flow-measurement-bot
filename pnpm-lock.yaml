@@ -15,11 +15,11 @@ importers:
         specifier: ^0.4.8
         version: 0.4.8
       '@napi-rs/canvas':
-        specifier: ^0.1.77
-        version: 0.1.77
+        specifier: ^0.1.78
+        version: 0.1.78
       atingester:
-        specifier: ^0.0.3
-        version: 0.0.3
+        specifier: ^0.0.4
+        version: 0.0.4
       better-sqlite3:
         specifier: ^12.2.0
         version: 12.2.0
@@ -46,8 +46,8 @@ importers:
         specifier: ^7.6.13
         version: 7.6.13
       '@types/node':
-        specifier: ^22.17.2
-        version: 22.17.2
+        specifier: ^22.18.0
+        version: 22.18.0
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
@@ -56,7 +56,7 @@ importers:
         version: 6.0.1
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.17.2)(typescript@5.9.2)
+        version: 10.9.2(@types/node@22.18.0)(typescript@5.9.2)
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -66,8 +66,8 @@ packages:
   '@atproto/api@0.15.27':
     resolution: {integrity: sha512-ok/WGafh1nz4t8pEQGtAF/32x2E2VDWU4af6BajkO5Gky2jp2q6cv6aB2A5yuvNNcc3XkYMYipsqVHVwLPMF9g==}
 
-  '@atproto/api@0.16.3':
-    resolution: {integrity: sha512-mM9p94oUSjVmhiaurftZp4gppsf1kmW0+N35KFudJqFG3UklxhJeR+z8pwmzrFpyR/+UU/oHdXoLhbGR8PKRQg==}
+  '@atproto/api@0.16.6':
+    resolution: {integrity: sha512-/ZDWeHNAMmQFicyITAoGCxQujDU+wyzsWjpPnQfVa+ZKMfZEngipMFOr4fBwxHixEFLmuh58+5vJyylAFVrQ4g==}
 
   '@atproto/common-web@0.4.2':
     resolution: {integrity: sha512-vrXwGNoFGogodjQvJDxAeP3QbGtawgZute2ed1XdRO0wMixLk3qewtikZm06H259QDJVu6voKC5mubml+WgQUw==}
@@ -84,26 +84,29 @@ packages:
     resolution: {integrity: sha512-Z0sLnJ87SeNdAifT+rqpgE1Rc3layMMW25gfWNo4u40RGuRODbdfAZlTwBSU2r+Vk45hU+iE+xeQspfednCEnA==}
     engines: {node: '>=18.7.0'}
 
-  '@atproto/lexicon@0.4.13':
-    resolution: {integrity: sha512-GtiNQz/cbGRCK0+uitWewx4tMyLEgQ8gTd118Ncl+gCbgcaFUPggi30NjEQNYg1DmCNUZNdrGsQfE97xNodouw==}
+  '@atproto/lexicon@0.4.14':
+    resolution: {integrity: sha512-jiKpmH1QER3Gvc7JVY5brwrfo+etFoe57tKPQX/SmPwjvUsFnJAow5xLIryuBaJgFAhnTZViXKs41t//pahGHQ==}
 
-  '@atproto/repo@0.8.6':
-    resolution: {integrity: sha512-b7VD4dD9upQzaEp6VMTu6tUbl5h/CzFNF5XWT6rMC4E/BByBZ1LY69sxtbNM8zgi4ss0e5glfnTY2FqIkXPP/A==}
+  '@atproto/lexicon@0.5.0':
+    resolution: {integrity: sha512-3aAzEAy9EAPs3CxznzMhEcqDd7m3vz1eze/ya9/ThbB7yleqJIhz5GY2q76tCCwHPhn5qDDMhlA9kKV6fG23gA==}
+
+  '@atproto/repo@0.8.8':
+    resolution: {integrity: sha512-Zq5UBurRsHFCi1Ol+KS2C58CrojyLw7CBfXpoqte78VcyOvKFxuj5bE8o96j2fOVGqXjjdNI2f54scHcpZxotA==}
     engines: {node: '>=18.7.0'}
 
-  '@atproto/sync@0.1.31':
-    resolution: {integrity: sha512-EsLZWuB3LW9j0HmuOtn1oAmRIUkc1GgLelhge3V+/OaFYi+xVArvhxKf/WbpKhpzWYGUUBw46kw7LdXcqvjJ1g==}
+  '@atproto/sync@0.1.33':
+    resolution: {integrity: sha512-0L4BgfaNPmTzamaDRmAqc/vkJdbiz8D2LgepiuIhVe2lsqLEbGxuxrejuRPQE7fXnoHKdzLUx6u+xdC+tZi8Gw==}
     engines: {node: '>=18.7.0'}
 
-  '@atproto/syntax@0.4.0':
-    resolution: {integrity: sha512-b9y5ceHS8YKOfP3mdKmwAx5yVj9294UN7FG2XzP6V5aKUdFazEYRnR9m5n5ZQFKa3GNvz7de9guZCJ/sUTcOAA==}
+  '@atproto/syntax@0.4.1':
+    resolution: {integrity: sha512-CJdImtLAiFO+0z3BWTtxwk6aY5w4t8orHTMVJgkf++QRJWTxPbIFko/0hrkADB7n2EruDxDSeAgfUGehpH6ngw==}
 
-  '@atproto/xrpc-server@0.9.2':
-    resolution: {integrity: sha512-wmbK4/izZJs5XhGOW+Mq9PTNh1gHGwpFiMBYQTIP8seUBTi/W9q5zWTk6CickUNxydldQj5TwTnLhq3cUYOSLA==}
+  '@atproto/xrpc-server@0.9.4':
+    resolution: {integrity: sha512-HJFgUV8ZzyDPRjTOA/oYU4H9YgLnm7aYTn36YmohLsbwuem3sEz/8dhaF2S0L+PXl2dOG08Ot6yg08GPHuXQvw==}
     engines: {node: '>=18.7.0'}
 
-  '@atproto/xrpc@0.7.2':
-    resolution: {integrity: sha512-cMF4J2EyRpZ3uYN7U5/0tIgRT5hLMlFfkgLzlg8OtQooAzOyC3iAZOsrv9ukexj0Jna/fzavbhlkrWqFSy39Fg==}
+  '@atproto/xrpc@0.7.4':
+    resolution: {integrity: sha512-sDi68+QE1XHegTaNAndlX41Gp827pouSzSs8CyAwhrqZdsJUxE3P7TMtrA0z+zAjvxVyvzscRc0TsN/fGUGrhw==}
 
   '@bokuweb/zstd-wasm@0.0.27':
     resolution: {integrity: sha512-GDm2uOTK3ESjnYmSeLQifJnBsRCWajKLvN32D2ZcQaaCIJI/Hse9s74f7APXjHit95S10UImsRGkTsbwHmrtmg==}
@@ -170,68 +173,68 @@ packages:
   '@kurkle/color@0.3.4':
     resolution: {integrity: sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w==}
 
-  '@napi-rs/canvas-android-arm64@0.1.77':
-    resolution: {integrity: sha512-jC8YX0rbAnu9YrLK1A52KM2HX9EDjrJSCLVuBf9Dsov4IC6GgwMLS2pwL9GFLJnSZBFgdwnA84efBehHT9eshA==}
+  '@napi-rs/canvas-android-arm64@0.1.78':
+    resolution: {integrity: sha512-N1ikxztjrRmh8xxlG5kYm1RuNr8ZW1EINEDQsLhhuy7t0pWI/e7SH91uFVLZKCMDyjel1tyWV93b5fdCAi7ggw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [android]
 
-  '@napi-rs/canvas-darwin-arm64@0.1.77':
-    resolution: {integrity: sha512-VFaCaCgAV0+hPwXajDIiHaaGx4fVCuUVYp/CxCGXmTGz699ngIEBx3Sa2oDp0uk3X+6RCRLueb7vD44BKBiPIg==}
+  '@napi-rs/canvas-darwin-arm64@0.1.78':
+    resolution: {integrity: sha512-FA3aCU3G5yGc74BSmnLJTObnZRV+HW+JBTrsU+0WVVaNyVKlb5nMvYAQuieQlRVemsAA2ek2c6nYtHh6u6bwFw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@napi-rs/canvas-darwin-x64@0.1.77':
-    resolution: {integrity: sha512-uD2NSkf6I4S3o0POJDwweK85FE4rfLNA2N714MgiEEMMw5AmupfSJGgpYzcyEXtPzdaca6rBfKcqNvzR1+EyLQ==}
+  '@napi-rs/canvas-darwin-x64@0.1.78':
+    resolution: {integrity: sha512-xVij69o9t/frixCDEoyWoVDKgE3ksLGdmE2nvBWVGmoLu94MWUlv2y4Qzf5oozBmydG5Dcm4pRHFBM7YWa1i6g==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@napi-rs/canvas-linux-arm-gnueabihf@0.1.77':
-    resolution: {integrity: sha512-03GxMMZGhHRQxiA4gyoKT6iQSz8xnA6T9PAfg/WNJnbkVMFZG782DwUJUb39QIZ1uE1euMCPnDgWAJ092MmgJQ==}
+  '@napi-rs/canvas-linux-arm-gnueabihf@0.1.78':
+    resolution: {integrity: sha512-aSEXrLcIpBtXpOSnLhTg4jPsjJEnK7Je9KqUdAWjc7T8O4iYlxWxrXFIF8rV8J79h5jNdScgZpAUWYnEcutR3g==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
 
-  '@napi-rs/canvas-linux-arm64-gnu@0.1.77':
-    resolution: {integrity: sha512-ZO+d2gRU9JU1Bb7SgJcJ1k9wtRMCpSWjJAJ+2phhu0Lw5As8jYXXXmLKmMTGs1bOya2dBMYDLzwp7KS/S/+aCA==}
+  '@napi-rs/canvas-linux-arm64-gnu@0.1.78':
+    resolution: {integrity: sha512-dlEPRX1hLGKaY3UtGa1dtkA1uGgFITn2mDnfI6YsLlYyLJQNqHx87D1YTACI4zFCUuLr/EzQDzuX+vnp9YveVg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@napi-rs/canvas-linux-arm64-musl@0.1.77':
-    resolution: {integrity: sha512-S1KtnP1+nWs2RApzNkdNf8X4trTLrHaY7FivV61ZRaL8NvuGOkSkKa+gWN2iedIGFEDz6gecpl/JAUSewwFXYg==}
+  '@napi-rs/canvas-linux-arm64-musl@0.1.78':
+    resolution: {integrity: sha512-TsCfjOPZtm5Q/NO1EZHR5pwDPSPjPEttvnv44GL32Zn1uvudssjTLbvaG1jHq81Qxm16GTXEiYLmx4jOLZQYlg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@napi-rs/canvas-linux-riscv64-gnu@0.1.77':
-    resolution: {integrity: sha512-A4YIKFYUwDtrSzCtdCAO5DYmRqlhCVKHdpq0+dBGPnIEhOQDFkPBTfoTAjO3pjlEnorlfKmNMOH21sKQg2esGA==}
+  '@napi-rs/canvas-linux-riscv64-gnu@0.1.78':
+    resolution: {integrity: sha512-+cpTTb0GDshEow/5Fy8TpNyzaPsYb3clQIjgWRmzRcuteLU+CHEU/vpYvAcSo7JxHYPJd8fjSr+qqh+nI5AtmA==}
     engines: {node: '>= 10'}
     cpu: [riscv64]
     os: [linux]
 
-  '@napi-rs/canvas-linux-x64-gnu@0.1.77':
-    resolution: {integrity: sha512-Lt6Sef5l0+5O1cSZ8ysO0JI+x+rSrqZyXs5f7+kVkCAOVq8X5WTcDVbvWvEs2aRhrWTp5y25Jf2Bn+3IcNHOuQ==}
+  '@napi-rs/canvas-linux-x64-gnu@0.1.78':
+    resolution: {integrity: sha512-wxRcvKfvYBgtrO0Uy8OmwvjlnTcHpY45LLwkwVNIWHPqHAsyoTyG/JBSfJ0p5tWRzMOPDCDqdhpIO4LOgXjeyg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@napi-rs/canvas-linux-x64-musl@0.1.77':
-    resolution: {integrity: sha512-NiNFvC+D+omVeJ3IjYlIbyt/igONSABVe9z0ZZph29epHgZYu4eHwV9osfpRt1BGGOAM8LkFrHk4LBdn2EDymA==}
+  '@napi-rs/canvas-linux-x64-musl@0.1.78':
+    resolution: {integrity: sha512-vQFOGwC9QDP0kXlhb2LU1QRw/humXgcbVp8mXlyBqzc/a0eijlLF9wzyarHC1EywpymtS63TAj8PHZnhTYN6hg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@napi-rs/canvas-win32-x64-msvc@0.1.77':
-    resolution: {integrity: sha512-fP6l0hZiWykyjvpZTS3sI46iib8QEflbPakNoUijtwyxRuOPTTBfzAWZUz5z2vKpJJ/8r305wnZeZ8lhsBHY5A==}
+  '@napi-rs/canvas-win32-x64-msvc@0.1.78':
+    resolution: {integrity: sha512-/eKlTZBtGUgpRKalzOzRr6h7KVSuziESWXgBcBnXggZmimwIJWPJlEcbrx5Tcwj8rPuZiANXQOG9pPgy9Q4LTQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
-  '@napi-rs/canvas@0.1.77':
-    resolution: {integrity: sha512-N9w2DkEKE1AXGp3q55GBOP6BEoFrqChDiFqJtKViTpQCWNOSVuMz7LkoGehbnpxtidppbsC36P0kCZNqJKs29w==}
+  '@napi-rs/canvas@0.1.78':
+    resolution: {integrity: sha512-YaBHJvT+T1DoP16puvWM6w46Lq3VhwKIJ8th5m1iEJyGh7mibk5dT7flBvMQ1EH1LYmMzXJ+OUhu+8wQ9I6u7g==}
     engines: {node: '>= 10'}
 
   '@noble/curves@1.9.7':
@@ -260,8 +263,8 @@ packages:
   '@types/luxon@3.7.1':
     resolution: {integrity: sha512-H3iskjFIAn5SlJU7OuxUmTEpebK6TKB8rxZShDslBMZJ5u9S//KM1sbdAisiSrqwLQncVjnpi2OK2J51h+4lsg==}
 
-  '@types/node@22.17.2':
-    resolution: {integrity: sha512-gL6z5N9Jm9mhY+U2KXZpteb+09zyffliRkZyZOHODGATyC5B1Jt/7TzuuiLkFsSUMLbS1OLmlj/E+/3KF4Q/4w==}
+  '@types/node@22.18.0':
+    resolution: {integrity: sha512-m5ObIqwsUp6BZzyiy4RdZpzWGub9bqLJMvZDD0QMXhxjqMHMENlj+SqF5QxoUwaQNFe+8kz8XM8ZQhqkQPTgMQ==}
 
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
@@ -305,8 +308,8 @@ packages:
   array-flatten@1.1.1:
     resolution: {integrity: sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==}
 
-  atingester@0.0.3:
-    resolution: {integrity: sha512-DiwkUOfNcY6EI2dheOZ39+V6TCFqeq2DTk5aU2jwNyiSQsJtPz09kG98mPFVhmZMAWr2EgWMu7VIGaqcnP38Yw==}
+  atingester@0.0.4:
+    resolution: {integrity: sha512-D8TK6nS5mXQuXyBQWC0qRWVc48PPeHmIItd8DrD4Z+Xits/lGRW4CfQuAlxZtMKCtZBex6D+C95vts+2I5l7Tw==}
     engines: {node: '>= 18.7.0'}
 
   atomic-sleep@1.0.0:
@@ -904,8 +907,8 @@ packages:
   thread-stream@2.7.0:
     resolution: {integrity: sha512-qQiRWsU/wvNolI6tbbCKd9iKaTnCXsTwVxhhKM6nctPdujTyztjlbUkUTUymidWcMnZ5pWR0ej4a0tjsW021vw==}
 
-  tlds@1.259.0:
-    resolution: {integrity: sha512-AldGGlDP0PNgwppe2quAvuBl18UcjuNtOnDuUkqhd6ipPqrYYBt3aTxK1QTsBVknk97lS2JcafWMghjGWFtunw==}
+  tlds@1.260.0:
+    resolution: {integrity: sha512-78+28EWBhCEE7qlyaHA9OR3IPvbCLiDh3Ckla593TksfFc9vfTsgvH7eS+dr3o9qr31gwGbogcI16yN91PoRjQ==}
     hasBin: true
 
   toidentifier@1.0.1:
@@ -1008,23 +1011,23 @@ snapshots:
   '@atproto/api@0.15.27':
     dependencies:
       '@atproto/common-web': 0.4.2
-      '@atproto/lexicon': 0.4.13
-      '@atproto/syntax': 0.4.0
-      '@atproto/xrpc': 0.7.2
+      '@atproto/lexicon': 0.4.14
+      '@atproto/syntax': 0.4.1
+      '@atproto/xrpc': 0.7.4
       await-lock: 2.2.2
       multiformats: 9.9.0
-      tlds: 1.259.0
+      tlds: 1.260.0
       zod: 3.25.76
 
-  '@atproto/api@0.16.3':
+  '@atproto/api@0.16.6':
     dependencies:
       '@atproto/common-web': 0.4.2
-      '@atproto/lexicon': 0.4.13
-      '@atproto/syntax': 0.4.0
-      '@atproto/xrpc': 0.7.2
+      '@atproto/lexicon': 0.5.0
+      '@atproto/syntax': 0.4.1
+      '@atproto/xrpc': 0.7.4
       await-lock: 2.2.2
       multiformats: 9.9.0
-      tlds: 1.259.0
+      tlds: 1.260.0
       zod: 3.25.76
 
   '@atproto/common-web@0.4.2':
@@ -1054,34 +1057,42 @@ snapshots:
       '@atproto/common-web': 0.4.2
       '@atproto/crypto': 0.4.4
 
-  '@atproto/lexicon@0.4.13':
+  '@atproto/lexicon@0.4.14':
     dependencies:
       '@atproto/common-web': 0.4.2
-      '@atproto/syntax': 0.4.0
+      '@atproto/syntax': 0.4.1
       iso-datestring-validator: 2.2.2
       multiformats: 9.9.0
       zod: 3.25.76
 
-  '@atproto/repo@0.8.6':
+  '@atproto/lexicon@0.5.0':
+    dependencies:
+      '@atproto/common-web': 0.4.2
+      '@atproto/syntax': 0.4.1
+      iso-datestring-validator: 2.2.2
+      multiformats: 9.9.0
+      zod: 3.25.76
+
+  '@atproto/repo@0.8.8':
     dependencies:
       '@atproto/common': 0.4.11
       '@atproto/common-web': 0.4.2
       '@atproto/crypto': 0.4.4
-      '@atproto/lexicon': 0.4.13
+      '@atproto/lexicon': 0.5.0
       '@ipld/dag-cbor': 7.0.3
       multiformats: 9.9.0
       uint8arrays: 3.0.0
       varint: 6.0.0
       zod: 3.25.76
 
-  '@atproto/sync@0.1.31':
+  '@atproto/sync@0.1.33':
     dependencies:
       '@atproto/common': 0.4.11
       '@atproto/identity': 0.4.8
-      '@atproto/lexicon': 0.4.13
-      '@atproto/repo': 0.8.6
-      '@atproto/syntax': 0.4.0
-      '@atproto/xrpc-server': 0.9.2
+      '@atproto/lexicon': 0.5.0
+      '@atproto/repo': 0.8.8
+      '@atproto/syntax': 0.4.1
+      '@atproto/xrpc-server': 0.9.4
       multiformats: 9.9.0
       p-queue: 6.6.2
       ws: 8.18.3
@@ -1090,14 +1101,14 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@atproto/syntax@0.4.0': {}
+  '@atproto/syntax@0.4.1': {}
 
-  '@atproto/xrpc-server@0.9.2':
+  '@atproto/xrpc-server@0.9.4':
     dependencies:
       '@atproto/common': 0.4.11
       '@atproto/crypto': 0.4.4
-      '@atproto/lexicon': 0.4.13
-      '@atproto/xrpc': 0.7.2
+      '@atproto/lexicon': 0.5.0
+      '@atproto/xrpc': 0.7.4
       cbor-x: 1.6.0
       express: 4.21.2
       http-errors: 2.0.0
@@ -1111,9 +1122,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@atproto/xrpc@0.7.2':
+  '@atproto/xrpc@0.7.4':
     dependencies:
-      '@atproto/lexicon': 0.4.13
+      '@atproto/lexicon': 0.5.0
       zod: 3.25.76
 
   '@bokuweb/zstd-wasm@0.0.27': {}
@@ -1171,48 +1182,48 @@ snapshots:
 
   '@kurkle/color@0.3.4': {}
 
-  '@napi-rs/canvas-android-arm64@0.1.77':
+  '@napi-rs/canvas-android-arm64@0.1.78':
     optional: true
 
-  '@napi-rs/canvas-darwin-arm64@0.1.77':
+  '@napi-rs/canvas-darwin-arm64@0.1.78':
     optional: true
 
-  '@napi-rs/canvas-darwin-x64@0.1.77':
+  '@napi-rs/canvas-darwin-x64@0.1.78':
     optional: true
 
-  '@napi-rs/canvas-linux-arm-gnueabihf@0.1.77':
+  '@napi-rs/canvas-linux-arm-gnueabihf@0.1.78':
     optional: true
 
-  '@napi-rs/canvas-linux-arm64-gnu@0.1.77':
+  '@napi-rs/canvas-linux-arm64-gnu@0.1.78':
     optional: true
 
-  '@napi-rs/canvas-linux-arm64-musl@0.1.77':
+  '@napi-rs/canvas-linux-arm64-musl@0.1.78':
     optional: true
 
-  '@napi-rs/canvas-linux-riscv64-gnu@0.1.77':
+  '@napi-rs/canvas-linux-riscv64-gnu@0.1.78':
     optional: true
 
-  '@napi-rs/canvas-linux-x64-gnu@0.1.77':
+  '@napi-rs/canvas-linux-x64-gnu@0.1.78':
     optional: true
 
-  '@napi-rs/canvas-linux-x64-musl@0.1.77':
+  '@napi-rs/canvas-linux-x64-musl@0.1.78':
     optional: true
 
-  '@napi-rs/canvas-win32-x64-msvc@0.1.77':
+  '@napi-rs/canvas-win32-x64-msvc@0.1.78':
     optional: true
 
-  '@napi-rs/canvas@0.1.77':
+  '@napi-rs/canvas@0.1.78':
     optionalDependencies:
-      '@napi-rs/canvas-android-arm64': 0.1.77
-      '@napi-rs/canvas-darwin-arm64': 0.1.77
-      '@napi-rs/canvas-darwin-x64': 0.1.77
-      '@napi-rs/canvas-linux-arm-gnueabihf': 0.1.77
-      '@napi-rs/canvas-linux-arm64-gnu': 0.1.77
-      '@napi-rs/canvas-linux-arm64-musl': 0.1.77
-      '@napi-rs/canvas-linux-riscv64-gnu': 0.1.77
-      '@napi-rs/canvas-linux-x64-gnu': 0.1.77
-      '@napi-rs/canvas-linux-x64-musl': 0.1.77
-      '@napi-rs/canvas-win32-x64-msvc': 0.1.77
+      '@napi-rs/canvas-android-arm64': 0.1.78
+      '@napi-rs/canvas-darwin-arm64': 0.1.78
+      '@napi-rs/canvas-darwin-x64': 0.1.78
+      '@napi-rs/canvas-linux-arm-gnueabihf': 0.1.78
+      '@napi-rs/canvas-linux-arm64-gnu': 0.1.78
+      '@napi-rs/canvas-linux-arm64-musl': 0.1.78
+      '@napi-rs/canvas-linux-riscv64-gnu': 0.1.78
+      '@napi-rs/canvas-linux-x64-gnu': 0.1.78
+      '@napi-rs/canvas-linux-x64-musl': 0.1.78
+      '@napi-rs/canvas-win32-x64-msvc': 0.1.78
 
   '@noble/curves@1.9.7':
     dependencies:
@@ -1230,17 +1241,17 @@ snapshots:
 
   '@types/better-sqlite3@7.6.13':
     dependencies:
-      '@types/node': 22.17.2
+      '@types/node': 22.18.0
 
   '@types/luxon@3.7.1': {}
 
-  '@types/node@22.17.2':
+  '@types/node@22.18.0':
     dependencies:
       undici-types: 6.21.0
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.17.2
+      '@types/node': 22.18.0
 
   abort-controller@3.0.0:
     dependencies:
@@ -1271,17 +1282,17 @@ snapshots:
 
   array-flatten@1.1.1: {}
 
-  atingester@0.0.3:
+  atingester@0.0.4:
     dependencies:
-      '@atproto/api': 0.16.3
+      '@atproto/api': 0.16.6
       '@atproto/common': 0.4.11
       '@atproto/common-web': 0.4.2
       '@atproto/identity': 0.4.8
-      '@atproto/lexicon': 0.4.13
-      '@atproto/repo': 0.8.6
-      '@atproto/sync': 0.1.31
-      '@atproto/syntax': 0.4.0
-      '@atproto/xrpc-server': 0.9.2
+      '@atproto/lexicon': 0.4.14
+      '@atproto/repo': 0.8.8
+      '@atproto/sync': 0.1.33
+      '@atproto/syntax': 0.4.1
+      '@atproto/xrpc-server': 0.9.4
       '@bokuweb/zstd-wasm': 0.0.27
       multiformats: 9.9.0
       ws: 8.18.3
@@ -1923,18 +1934,18 @@ snapshots:
     dependencies:
       real-require: 0.2.0
 
-  tlds@1.259.0: {}
+  tlds@1.260.0: {}
 
   toidentifier@1.0.1: {}
 
-  ts-node@10.9.2(@types/node@22.17.2)(typescript@5.9.2):
+  ts-node@10.9.2(@types/node@22.18.0)(typescript@5.9.2):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 22.17.2
+      '@types/node': 22.18.0
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3

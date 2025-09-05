@@ -1,6 +1,9 @@
-import { JetstreamEventKind, JetstreamRecord } from 'atingester'
+import { JetstreamEventKind } from 'atingester'
+import fs from 'fs'
+import path from 'path'
 import { WebSocket } from 'ws'
 import { AtpAgent, type AppBskyEmbedImages } from '@atproto/api'
+import { createDCtx, decompressUsingDict, init } from '@bokuweb/zstd-wasm'
 import { HistoryPosterTable } from './db/types'
 import {
   generateAllPosterImage,
@@ -19,9 +22,11 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
 
   const measureSecond = 60
   const method = 'subscribe'
-  const wantedCollections = ['app.bsky.feed.post', 'app.bsky.feed.like']
-  const query = wantedCollections.map(v => 'wantedCollections='+v).join('&')
-  const url = `${env.JETSTREAM_ENDPOINT}/${method}?${query}`
+  const query = {
+    wantedCollections: ['app.bsky.feed.post', 'app.bsky.feed.like'],
+    compress: env.JETSTREAM_COMPRESS,
+  }
+  const url = `${env.JETSTREAM_ENDPOINT}/${method}?${encodeQueryParams(query)}`
   const cursors: Cursors = {
     all: [],
     posts: {
@@ -33,6 +38,8 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
       ja: [],
     },
   }
+  await init()
+  const dict = fs.readFileSync(path.resolve(__dirname, '../dict/zstd_dictionary'))
   const ws = new WebSocket(url)
 
   ws.on('open', () => {
@@ -40,28 +47,45 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
   })
 
   ws.on('message', (data) => {
-    const event = JSON.parse(data.toString()) as JetstreamEventKind
-    if (cursors.all.length === 0 || event.time_us < (cursors.all[0] + measureSecond*(10**6))) {
-      cursors.all.push(event.time_us)
-      if (event.kind === 'commit'){
-        if (event.commit.operation === 'create') {
-          if (event.commit.record.$type === 'app.bsky.feed.post' && event.commit.record.text) {
-            cursors.posts.all.push(event.time_us)
-            if (isJa(event.commit.record)) cursors.posts.ja.push(event.time_us)
-          } else if (event.commit.record.$type === 'app.bsky.feed.like') {
-            const subject = event.commit.record.subject as {uri: string, cid: string}
+    let dataText: string
+    if (env.JETSTREAM_COMPRESS) {
+      let buf: Uint8Array<ArrayBufferLike>
+      if (Array.isArray(data)) {
+        buf = Uint8Array.from(data)
+      } else if (data instanceof Buffer) {
+        buf = data
+      } else if (data instanceof ArrayBuffer) {
+        buf = new Uint8Array(data)
+      } else {
+        return ctx.logger.error('Failed to convert RawData.')
+      }
+      const decompressed = decompressUsingDict(createDCtx(), buf, dict)
+      dataText = Buffer.from(decompressed).toString()
+    } else {
+      dataText = data.toString()
+    }
+    const evt = JSON.parse(dataText) as JetstreamEventKind
+    if (cursors.all.length === 0 || evt.time_us < (cursors.all[0] + measureSecond*(10**6))) {
+      cursors.all.push(evt.time_us)
+      if (evt.kind === 'commit'){
+        if (evt.commit.operation === 'create') {
+          if (evt.commit.record.$type === 'app.bsky.feed.post' && evt.commit.record.text) {
+            cursors.posts.all.push(evt.time_us)
+            if (isJa(evt.commit.record)) cursors.posts.ja.push(evt.time_us)
+          } else if (evt.commit.record.$type === 'app.bsky.feed.like') {
+            const subject = evt.commit.record.subject as {uri: string, cid: string}
             cursors.likes.all.push(subject.uri)
           }
         }
-      } else if (event.kind === 'identity') {
-      } else if (event.kind === 'account') {
+      } else if (evt.kind === 'identity') {
+      } else if (evt.kind === 'account') {
       }
     } else {
       ws.close()
     }
   })
 
-  ws.on('error', (error) => {})
+  ws.on('error', (error) => ctx.logger.error(error.message))
 
   ws.on('close', async (code, reason) => {
     ctx.logger.debug('close処理')
@@ -216,6 +240,45 @@ export const isJa = (record: any): boolean => {
     return true
   }
   return false
+}
+
+function encodeQueryParams(obj: Record<string, unknown>): string {
+  const params = new URLSearchParams()
+  Object.entries(obj).forEach(([key, value]) => {
+    const encoded = encodeQueryParam(value)
+    if (Array.isArray(encoded)) {
+      encoded.forEach((enc) => params.append(key, enc))
+    } else {
+      if (encoded) params.set(key, encoded)
+    }
+  })
+  return params.toString()
+}
+
+// Adapted from xrpc, but without any lex-specific knowledge
+function encodeQueryParam(value: unknown): string | string[] {
+  if (typeof value === 'string') {
+    return value
+  }
+  if (typeof value === 'number') {
+    return value.toString()
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'true' : 'false'
+  }
+  if (typeof value === 'undefined') {
+    return ''
+  }
+  if (typeof value === 'object') {
+    if (value instanceof Date) {
+      return value.toISOString()
+    } else if (Array.isArray(value)) {
+      return value.flatMap(encodeQueryParam)
+    } else if (!value) {
+      return ''
+    }
+  }
+  throw new Error(`Cannot encode ${typeof value}s into query params`)
 }
 
 const generateImageLex = async (agent: AtpAgent, imageData: imageData): Promise<AppBskyEmbedImages.Image> => {

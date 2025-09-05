@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import { cleanEnv, str, testOnly } from 'envalid'
+import { bool, cleanEnv, str, testOnly } from 'envalid'
 import AtpAgent from '@atproto/api'
 import { type Database } from '../db'
 import { type Logger } from './logger'
@@ -18,6 +18,7 @@ export const env = cleanEnv(process.env, {
     choices: ['test', 'production'],
   }),
   JETSTREAM_ENDPOINT: str(),
+  JETSTREAM_COMPRESS: bool(),
   BLUESKY_SERVICE: str(),
   BLUESKY_IDENTIFIER: str(),
   BLUESKY_PASSWORD: str(),

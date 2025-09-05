@@ -71,6 +71,7 @@ export class Bot {
         jetstreamLogger.error(err.message)
       },
       service: env.JETSTREAM_ENDPOINT,
+      compress: env.JETSTREAM_COMPRESS,
       filterCollections: ['app.bsky.feed.post'],
       excludeIdentity: true,
       excludeAccount: true,

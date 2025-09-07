@@ -18,8 +18,8 @@ importers:
         specifier: ^0.1.78
         version: 0.1.78
       atingester:
-        specifier: ^0.0.5
-        version: 0.0.5
+        specifier: ^0.0.6
+        version: 0.0.6
       better-sqlite3:
         specifier: ^12.2.0
         version: 12.2.0
@@ -59,9 +59,6 @@ packages:
 
   '@atproto/api@0.15.27':
     resolution: {integrity: sha512-ok/WGafh1nz4t8pEQGtAF/32x2E2VDWU4af6BajkO5Gky2jp2q6cv6aB2A5yuvNNcc3XkYMYipsqVHVwLPMF9g==}
-
-  '@atproto/api@0.16.7':
-    resolution: {integrity: sha512-EdVWkEgaEQm1LEiiP1fW/XXXpMNmtvT5c9+cZVRiwYc4rTB66WIJJWqmaMT/tB7nccMkFjr6FtwObq5LewWfgw==}
 
   '@atproto/common-web@0.4.2':
     resolution: {integrity: sha512-vrXwGNoFGogodjQvJDxAeP3QbGtawgZute2ed1XdRO0wMixLk3qewtikZm06H259QDJVu6voKC5mubml+WgQUw==}
@@ -299,8 +296,8 @@ packages:
   array-flatten@1.1.1:
     resolution: {integrity: sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==}
 
-  atingester@0.0.5:
-    resolution: {integrity: sha512-vCc/2UWjB1Fkj/awg9DOPrNzPfz1Uw2BKaORspWazQOVxjwFkwbJudupR8sZCxyWsfQ2sjTKEBzt7EVRSni+zg==}
+  atingester@0.0.6:
+    resolution: {integrity: sha512-a8r/jifNFrROcVli+dkhl1SSo8hPVpbvWJ55MTvOMmGDcPctbzsMqV6OQuUWo9ymhGRJFtPeGc0RbbGumB0k7g==}
     engines: {node: '>= 18.7.0'}
 
   atomic-sleep@1.0.0:
@@ -1010,17 +1007,6 @@ snapshots:
       tlds: 1.260.0
       zod: 3.25.76
 
-  '@atproto/api@0.16.7':
-    dependencies:
-      '@atproto/common-web': 0.4.2
-      '@atproto/lexicon': 0.5.0
-      '@atproto/syntax': 0.4.1
-      '@atproto/xrpc': 0.7.4
-      await-lock: 2.2.2
-      multiformats: 9.9.0
-      tlds: 1.260.0
-      zod: 3.25.76
-
   '@atproto/common-web@0.4.2':
     dependencies:
       graphemer: 1.4.0
@@ -1269,9 +1255,8 @@ snapshots:
 
   array-flatten@1.1.1: {}
 
-  atingester@0.0.5:
+  atingester@0.0.6:
     dependencies:
-      '@atproto/api': 0.16.7
       '@atproto/common': 0.4.11
       '@atproto/common-web': 0.4.2
       '@atproto/identity': 0.4.8

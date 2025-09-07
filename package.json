@@ -19,7 +19,6 @@
   "dependencies": {
     "@atproto/api": "^0.15.27",
     "@atproto/identity": "^0.4.8",
-    "@bokuweb/zstd-wasm": "^0.0.27",
     "@napi-rs/canvas": "^0.1.78",
     "atingester": "^0.0.5",
     "better-sqlite3": "^12.2.0",
@@ -27,13 +26,11 @@
     "cron": "^4.3.3",
     "dotenv": "^16.6.1",
     "envalid": "^8.1.0",
-    "kysely": "^0.28.5",
-    "ws": "^8.18.3"
+    "kysely": "^0.28.5"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^22.18.0",
-    "@types/ws": "^8.18.1",
+    "@types/node": "^22.18.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"

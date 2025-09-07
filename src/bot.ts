@@ -64,18 +64,13 @@ export class Bot {
             .execute()
         }
       },
-      onInfo: (info) => {
-        jetstreamLogger.info(info)
-      },
-      onError: (err) => {
-        jetstreamLogger.error(err.message)
-      },
+      onInfo: jetstreamLogger.info,
+      onError: (err: Error) => jetstreamLogger.error(err.message),
       service: env.JETSTREAM_ENDPOINT,
-      compress: env.JETSTREAM_COMPRESS,
+      compress: true,
       filterCollections: ['app.bsky.feed.post'],
       excludeIdentity: true,
       excludeAccount: true,
-      excludeCommit: false,
     })
 
     const ctx: AppContext = {

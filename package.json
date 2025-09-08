@@ -19,8 +19,8 @@
   "dependencies": {
     "@atproto/api": "^0.15.27",
     "@atproto/identity": "^0.4.8",
-    "@napi-rs/canvas": "^0.1.78",
-    "atingester": "^0.0.6",
+    "@napi-rs/canvas": "^0.1.79",
+    "atingester": "^0.0.7",
     "better-sqlite3": "^12.2.0",
     "chart.js": "^4.5.0",
     "cron": "^4.3.3",

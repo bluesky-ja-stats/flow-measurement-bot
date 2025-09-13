@@ -18,19 +18,19 @@
   "license": "MIT",
   "dependencies": {
     "@atproto/api": "^0.15.27",
-    "@atproto/identity": "^0.4.8",
-    "@napi-rs/canvas": "^0.1.79",
-    "atingester": "^0.0.7",
+    "@atproto/identity": "^0.4.9",
+    "@napi-rs/canvas": "^0.1.80",
+    "atingester": "^1.0.0",
     "better-sqlite3": "^12.2.0",
     "chart.js": "^4.5.0",
     "cron": "^4.3.3",
     "dotenv": "^16.6.1",
     "envalid": "^8.1.0",
-    "kysely": "^0.28.5"
+    "kysely": "^0.28.6"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^22.18.1",
+    "@types/node": "^22.18.3",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"

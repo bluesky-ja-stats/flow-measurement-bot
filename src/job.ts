@@ -35,10 +35,10 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
       if (cursors.all.length === 0 || evt.time_us < (cursors.all[0] + measureSecond*(10**6))) {
         cursors.all.push(evt.time_us)
         if (evt.event === 'create') {
-          if (evt.record.$type === 'app.bsky.feed.post' && evt.record.text) {
+          if (evt.collection === 'app.bsky.feed.post') {
             cursors.posts.all.push(evt.time_us)
             if (isJa(evt.record)) cursors.posts.ja.push(evt.time_us)
-          } else if (evt.record.$type === 'app.bsky.feed.like') {
+          } else if (evt.collection === 'app.bsky.feed.like') {
             const subject = evt.record.subject as {uri: string, cid: string}
             cursors.likes.all.push(subject.uri)
           }

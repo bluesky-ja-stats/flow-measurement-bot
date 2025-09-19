@@ -5,6 +5,8 @@ import { HistoryPosterTable } from './db/types'
 import {
   generateAllPosterImage,
   generateJpPosterImage,
+  generateAveragePostImage,
+  generateAverageLikeImage,
   generateDailyPostImage,
   generateDailyLikeImage,
   generateWeeklyPostImage,
@@ -158,13 +160,16 @@ export const monthly = async (ctx: AppContext): Promise<void> => {
 
   const targetDay = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})
 
+  const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').execute()).reverse()
   const historyPosterData = (await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'desc').where('created_at', 'like', `${targetDay.split('-').slice(0, 2).join('-')}-%`).execute()).reverse()
 
   const images: AppBskyEmbedImages.Image[] = []
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAveragePostImage('One-month', historyPostData, targetDay.split('-').slice(0, 2).join('-'))))
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAverageLikeImage('One-month', historyPostData, targetDay.split('-').slice(0, 2).join('-'))))
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateJpPosterImage('One-month', historyPosterData)))
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateAllPosterImage('One-month', historyPosterData)))
 
-  const text = `【月間報告】\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における、投稿者の増減のグラフです。`
+  const text = `【月間報告】\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における平均投稿数及び平均いいね数の増減のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における投稿者の増減のグラフです。`
   await createPost(ctx.agent, ctx.logger, text, images)
 }
 
@@ -173,13 +178,16 @@ export const yearly = async (ctx: AppContext): Promise<void> => {
 
   const targetDay = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})
 
+  const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').execute()).reverse()
   const historyPosterData = (await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'desc').where('created_at', 'like', `${targetDay.split('-')[0]}-%`).execute()).reverse()
 
   const images: AppBskyEmbedImages.Image[] = []
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAveragePostImage('One-year', historyPostData, targetDay.split('-')[0])))
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAverageLikeImage('One-year', historyPostData, targetDay.split('-')[0])))
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateJpPosterImage('One-year', historyPosterData)))
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateAllPosterImage('One-year', historyPosterData)))
 
-  const text = `【年間報告】\n\n\\\\\\ Happy New Year ///\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における、投稿者の増減のグラフです。`
+  const text = `【年間報告】\n\n\\\\\\ Happy New Year ///\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における平均投稿数及び平均いいね数の増減のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における投稿者の増減のグラフです。`
   await createPost(ctx.agent, ctx.logger, text, images)
 }
 

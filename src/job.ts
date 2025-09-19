@@ -231,17 +231,22 @@ const getPosts = async (agent: AtpAgent, logger: Logger, cursors: Cursors, uris:
   }
 }
 
-export const isJa = (record: any): boolean => {
-  let searchtext: string = record.text
-  if (record.embed.images && Array.isArray(record.embed.images)) {
-    for (const image of record.embed.images) searchtext += `\n${image.alt}`
-  }
-  if (record.embed.media.images && Array.isArray(record.embed.media.images)) {
-    for (const image of record.embed.media.images) searchtext += `\n${image.alt}`
-  }
-  if (record.embed?.alt) searchtext += `\n${record.embed.alt}`
-  if ((typeof record.langs !== 'undefined' && record.langs.includes('ja')) || (searchtext.match(/^.*[ぁ-んァ-ヶｱ-ﾝﾞﾟー]+.*$/))) {
-    return true
+export const isJa = (record: unknown): boolean => {
+  if (record && typeof record === 'object') {
+    let searchtext: string = ''
+    if ('text' in record) searchtext += `${record.text}\n`
+    if ('embed' in record && record.embed && typeof record.embed === 'object') {
+      if ('images' in record.embed && Array.isArray(record.embed.images)) {
+        for (const image of record.embed.images) searchtext += `${image.alt}\n`
+      }
+      if ('media' in record.embed && record.embed.media && typeof record.embed.media === 'object' && 'images' in record.embed.media && Array.isArray(record.embed.media.images)) {
+        for (const image of record.embed.media.images) searchtext += `${image.alt}\n`
+      }
+      if ('alt' in record.embed) searchtext += `${record.embed.alt}\n`
+    }
+    if (('langs' in record && Array.isArray(record.langs) && record.langs.includes('ja')) || searchtext.match(/^.*[ぁ-んァ-ヶｱ-ﾝﾞﾟー]+.*$/)) {
+      return true
+    }
   }
   return false
 }

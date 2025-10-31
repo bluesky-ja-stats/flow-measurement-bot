@@ -187,8 +187,8 @@ export function generateDailyPostImage(data: SelectHistory[]): imageData {
         legend: {position: 'bottom', labels: {font: {size: 30}}},
       },
       scales: {
-        yAll: { position: 'left', min: 0, suggestedMax: 8000, ticks: { font: { size: 24 } }, title: { text: 'All  [post/min]', display: true, padding: 8, font: { size: 32 } }, },
-        yJP: { position: 'right', min: 0, suggestedMax: 800, ticks: { font: { size: 24 } }, title: { text: 'JP  [post/min]', display: true, padding: 8, font: { size: 32 }, }, },
+        yAll: { position: 'left', min: 0, suggestedMax: 8000, ticks: { font: { size: 24 } }, title: { text: 'All  [post/min]', display: true, padding: 10, font: { size: 32 } }, },
+        yJP: { position: 'right', min: 0, suggestedMax: 800, ticks: { font: { size: 24 } }, title: { text: 'JP  [post/min]', display: true, padding: 10, font: { size: 32 }, }, },
         x: { ticks: { font: { size: 24, }, autoSkip: true, maxRotation: 0 } }
       },
     },

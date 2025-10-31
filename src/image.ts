@@ -38,8 +38,8 @@ export function generateAllPosterImage(prefix: string, data: SelectPosterHistory
         legend: {position: 'bottom', labels: {font: {size: 30}}},
       },
       scales: {
-        y: { position: 'left', min: 0, suggestedMax: 800000, ticks: { font: { size: 24 } }, title: { text: '[poster/day]', display: true, padding: 8, font: { size: 32 } }, },
-        x: { ticks: { font: { size: 24, }, autoSkip: true, maxRotation: 0 } }
+        y: { position: 'left', min: 0, suggestedMax: 800000, ticks: { font: { size: 24 } }, title: { text: '[account/day]', display: true, padding: 8, font: { size: 32 } }, },
+        x: { ticks: { font: { size: 24, }, autoSkip: true, maxRotation: 30 } }
       },
     },
   })
@@ -72,8 +72,8 @@ export function generateJpPosterImage(prefix: string, data: SelectPosterHistory[
         legend: {position: 'bottom', labels: {font: {size: 30}}},
       },
       scales: {
-        y: { position: 'left', min: 0, suggestedMax: 80000, ticks: { font: { size: 24 } }, title: { text: '[poster/day]', display: true, padding: 8, font: { size: 32 } }, },
-        x: { ticks: { font: { size: 24, }, autoSkip: true, maxRotation: 0 } }
+        y: { position: 'left', min: 0, suggestedMax: 80000, ticks: { font: { size: 24 } }, title: { text: '[account/day]', display: true, padding: 8, font: { size: 32 } }, },
+        x: { ticks: { font: { size: 24, }, autoSkip: true, maxRotation: 30 } }
       },
     },
   })

@@ -19,6 +19,7 @@ import { type Logger } from './util/logger'
 export const hourly = async (ctx: AppContext): Promise<void> => {
   ctx.logger.info('Start hourly job')
 
+  const d = new Date()
   const measureSecond = 60
   const cursors: Cursors = {
     all: [],
@@ -65,7 +66,6 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
   for (const sepLikes of cursors.likes.all.flatMap((_, i, a) => i % maxUriSize ? [] : [a.slice(i, i + maxUriSize)])) {
     await getPosts(ctx.agent, ctx.logger, cursors, sepLikes)
   }
-  const d = new Date(cursors.all[0]/(10**3))
 
   // DBに保存
   await ctx.db.insertInto('history').values({ created_at: d.toISOString(), like_all: cursors.likes.all.length*60/measureSecond, like_jp: cursors.likes.ja.length*60/measureSecond, post_all: cursors.posts.all.length*60/measureSecond, post_jp: cursors.posts.ja.length*60/measureSecond }).execute()
@@ -114,7 +114,7 @@ export const daily = async (ctx: AppContext): Promise<void> => {
 
     await ctx.db.insertInto('history_poster').values(historyPosterTable).execute()
 
-    const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp.toLocaleString('ja-JP')} [poster/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase.toLocaleString('ja-JP')} [poster/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease.toLocaleString('ja-JP')} [poster/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all.toLocaleString('ja-JP')} [poster/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase.toLocaleString('ja-JP')} [poster/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease.toLocaleString('ja-JP')} [poster/day]`
+    const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp.toLocaleString('ja-JP')} [account/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase.toLocaleString('ja-JP')} [account/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease.toLocaleString('ja-JP')} [account/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all.toLocaleString('ja-JP')} [account/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase.toLocaleString('ja-JP')} [account/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease.toLocaleString('ja-JP')} [account/day]`
     await createPost(ctx.agent, ctx.logger, text)
     return
   }
@@ -135,7 +135,7 @@ export const daily = async (ctx: AppContext): Promise<void> => {
     await ctx.db.deleteFrom('tmp_poster').where('date_did', 'like', `${deleteDay}=%`).execute()
   }
 
-  const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp.toLocaleString('ja-JP')} [poster/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase.toLocaleString('ja-JP')} [poster/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease.toLocaleString('ja-JP')} [poster/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all.toLocaleString('ja-JP')} [poster/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase.toLocaleString('ja-JP')} [poster/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease.toLocaleString('ja-JP')} [poster/day]`
+  const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp.toLocaleString('ja-JP')} [account/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase.toLocaleString('ja-JP')} [account/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease.toLocaleString('ja-JP')} [account/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all.toLocaleString('ja-JP')} [account/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase.toLocaleString('ja-JP')} [account/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease.toLocaleString('ja-JP')} [account/day]`
   await createPost(ctx.agent, ctx.logger, text)
 }
 

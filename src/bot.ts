@@ -48,20 +48,22 @@ export class Bot {
       idResolver: new IdResolver(),
       handleEvent: async (evt) => {
         if (evt.event === 'create') {
-          await ctx.db
-            .insertInto('tmp_poster')
-            .values({
-              date_did: `${new Date().toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})}=${evt.did}`,
-              is_jp: isJa(evt.record) ? 'true' : 'false',
-            })
-            .onConflict((oc) => oc
-              .column('date_did')
-              .where('is_jp', '=', 'false')
-              .doUpdateSet({
-                is_jp: (eb) => eb.ref('excluded.is_jp')
+          if (evt.collection === 'app.bsky.feed.post') {
+            await db
+              .insertInto('tmp_poster')
+              .values({
+                date_did: `${new Date().toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})}=${evt.did}`,
+                is_jp: `${isJa(evt.record)}`,
               })
-            )
-            .execute()
+              .onConflict((oc) => oc
+                .column('date_did')
+                .where('is_jp', '=', 'false')
+                .doUpdateSet({
+                  is_jp: (eb) => eb.ref('excluded.is_jp')
+                })
+              )
+              .execute()
+          }
         }
       },
       onInfo: jetstreamLogger.info,
@@ -80,10 +82,10 @@ export class Bot {
     }
     
     const hourlyJob = new CronJob('0 0 * * * *', async () => await hourly({...ctx, logger: createLogger(['Runner', 'Bot', 'HourlyJob'])}))
-    const dailyJob = new CronJob('1 0 0 * * *', async () => await daily({...ctx, logger: createLogger(['Runner', 'Bot', 'DailyJob'])}))
-    const weeklyJob = new CronJob('0 1 0 * * 1', async () => await weekly({...ctx, logger: createLogger(['Runner', 'Bot', 'WeeklyJob'])}))
-    const monthlyJob = new CronJob('0 1 0 1 * *', async () => await monthly({...ctx, logger: createLogger(['Runner', 'Bot', 'MonthlyJob'])}))
-    const yearlyJob = new CronJob('0 1 0 1 1 *', async () => await yearly({...ctx, logger: createLogger(['Runner', 'Bot', 'YearlyJob'])}))
+    const dailyJob = new CronJob('5 0 0 * * *', async () => await daily({...ctx, logger: createLogger(['Runner', 'Bot', 'DailyJob'])}))
+    const weeklyJob = new CronJob('0 2 0 * * 1', async () => await weekly({...ctx, logger: createLogger(['Runner', 'Bot', 'WeeklyJob'])}))
+    const monthlyJob = new CronJob('0 2 0 1 * *', async () => await monthly({...ctx, logger: createLogger(['Runner', 'Bot', 'MonthlyJob'])}))
+    const yearlyJob = new CronJob('0 2 0 1 1 *', async () => await yearly({...ctx, logger: createLogger(['Runner', 'Bot', 'YearlyJob'])}))
 
     logger.info('Bot has been created!')
 

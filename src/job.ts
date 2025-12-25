@@ -1,5 +1,5 @@
 import { Jetstream } from 'atingester'
-import { AtpAgent, type AppBskyEmbedImages } from '@atproto/api'
+import { AtpAgent, type AppBskyEmbedImages, type AppBskyFeedPost } from '@atproto/api'
 import { IdResolver } from '@atproto/identity'
 import { HistoryPosterTable } from './db/types'
 import {
@@ -115,7 +115,7 @@ export const daily = async (ctx: AppContext): Promise<void> => {
     await ctx.db.insertInto('history_poster').values(historyPosterTable).execute()
 
     const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp.toLocaleString('ja-JP')} [poster/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase.toLocaleString('ja-JP')} [poster/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease.toLocaleString('ja-JP')} [poster/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all.toLocaleString('ja-JP')} [poster/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase.toLocaleString('ja-JP')} [poster/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease.toLocaleString('ja-JP')} [poster/day]`
-    await createPost(ctx.agent, ctx.logger, text)
+    await createPost(ctx.agent, ctx.logger, text, [])
     return
   }
 
@@ -136,7 +136,7 @@ export const daily = async (ctx: AppContext): Promise<void> => {
   }
 
   const text = `【測定データ】\n\n測定対象: ${historyPosterTable.created_at}\n\n日本語話者数　　 　　　 : ${historyPosterTable.jp.toLocaleString('ja-JP')} [poster/day]\n日本語話者増加数(前日比): ${historyPosterTable.jp_increase.toLocaleString('ja-JP')} [poster/day]\n日本語話者減少数(前日比): ${historyPosterTable.jp_decrease.toLocaleString('ja-JP')} [poster/day]\n\n全投稿者数　　 　　　 : ${historyPosterTable.all.toLocaleString('ja-JP')} [poster/day]\n全投稿者増加数(前日比): ${historyPosterTable.all_increase.toLocaleString('ja-JP')} [poster/day]\n全投稿者減少数(前日比): ${historyPosterTable.all_decrease.toLocaleString('ja-JP')} [poster/day]`
-  await createPost(ctx.agent, ctx.logger, text)
+  await createPost(ctx.agent, ctx.logger, text, [])
 }
 
 export const weekly = async (ctx: AppContext): Promise<void> => {
@@ -181,27 +181,40 @@ export const yearly = async (ctx: AppContext): Promise<void> => {
   const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').execute()).reverse()
   const historyPosterData = (await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'desc').where('created_at', 'like', `${targetDay.split('-')[0]}-%`).execute()).reverse()
 
-  const images: AppBskyEmbedImages.Image[] = []
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAveragePostImage('One-year', historyPostData, targetDay.split('-')[0])))
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAverageLikeImage('One-year', historyPostData, targetDay.split('-')[0])))
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateJpPosterImage('One-year', historyPosterData)))
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAllPosterImage('One-year', historyPosterData)))
+  const rootImages: AppBskyEmbedImages.Image[] = []
+  rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateAveragePostImage('One-year', historyPostData, targetDay.split('-')[0])))
+  rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateAverageLikeImage('One-year', historyPostData, targetDay.split('-')[0])))
+  rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateJpPosterImage('One-year', historyPosterData)))
+  rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateAllPosterImage('One-year', historyPosterData)))
 
-  const text = `【年間報告】\n\n\\\\\\ Happy New Year ///\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における平均投稿数及び平均いいね数の増減のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における投稿者の増減のグラフです。`
-  await createPost(ctx.agent, ctx.logger, text, images)
+  const rootText = `【年間報告】(1/2)\n\n\\\\\\ Happy New Year ///\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における平均投稿数及び平均いいね数の増減のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における投稿者の増減のグラフです。`
+  const rootPost = await createPost(ctx.agent, ctx.logger, rootText, rootImages)
+
+  const topHistoryData_post_jp = await ctx.db.selectFrom('history').selectAll().orderBy('post_jp', 'desc').executeTakeFirst()
+  const topHistoryData_post_all = await ctx.db.selectFrom('history').selectAll().orderBy('post_all', 'desc').executeTakeFirst()
+  const topHistoryData_like_jp = await ctx.db.selectFrom('history').selectAll().orderBy('like_jp', 'desc').executeTakeFirst()
+  const topHistoryData_like_all = await ctx.db.selectFrom('history').selectAll().orderBy('like_all', 'desc').executeTakeFirst()
+  const topHistoryPosterData_jp = await ctx.db.selectFrom('history_poster').selectAll().orderBy('jp', 'desc').executeTakeFirst()
+  const topHistoryPosterData_all = await ctx.db.selectFrom('history_poster').selectAll().orderBy('all', 'desc').executeTakeFirst()
+  if (!topHistoryData_post_jp || !topHistoryData_post_all || !topHistoryData_like_jp || !topHistoryData_like_all || !topHistoryPosterData_jp || !topHistoryPosterData_all) {
+    ctx.logger.error('最高記録算出不可')
+    return
+  }
+  const childText = `【年間報告】(2/2)\n\n今年の最高記録をそれぞれ発表しま～す！\n\n日本語を含む投稿: ${new Date(topHistoryData_post_jp.created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}: ${topHistoryData_post_jp.post_jp.toLocaleString('ja-JP')} [post/min]\n全ての投稿　　　: ${new Date(topHistoryData_post_all.created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}: ${topHistoryData_post_all.post_all.toLocaleString('ja-JP')} [post/min]\n\n日本語を含む投稿へのいいね: ${new Date(topHistoryData_like_jp.created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}: ${topHistoryData_like_jp.like_jp.toLocaleString('ja-JP')} [like/min]\n全てのいいね　　　　　　　: ${new Date(topHistoryData_like_all.created_at).toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}: ${topHistoryData_like_all.like_all.toLocaleString('ja-JP')} [like/min]\n\n日本語話者数: ${topHistoryPosterData_jp.created_at}: ${topHistoryPosterData_jp.jp.toLocaleString('ja-JP')} [poster/day]\n全投稿者数　: ${topHistoryPosterData_all.created_at}: ${topHistoryPosterData_all.all.toLocaleString('ja-JP')} [poster/day]`
+  await createPost(ctx.agent, ctx.logger, childText, [], {root: rootPost, parent: rootPost})
 }
 
-const createPost = async (agent: AtpAgent, logger: Logger, text: string, images?: AppBskyEmbedImages.Image[]): Promise<void> => {
+const createPost = async (agent: AtpAgent, logger: Logger, text: string, images: AppBskyEmbedImages.Image[], reply?: {root: {cid: string, uri: string}, parent: {cid: string, uri: string}}): Promise<{uri: string, cid: string}> => {
   try {
-    if (images) {
-      await agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja'], embed: {$type: 'app.bsky.embed.images', images}})
-    } else {
-      await agent.post({$type: 'app.bsky.feed.post', text, langs: ['ja']})
-    }
+    const record: Partial<AppBskyFeedPost.Record> & Omit<AppBskyFeedPost.Record, 'createdAt'> = {$type: 'app.bsky.feed.post', text, langs: ['ja']}
+    if (images.length > 0) record.embed = {$type: 'app.bsky.embed.images', images}
+    if (reply) record.reply = reply
+    const res = await agent.post(record)
     logger.info(text)
+    return res
   } catch {
     logger.error('AtpAgent could not create post. Try again now...')
-    await createPost(agent, logger, text, images)
+    return await createPost(agent, logger, text, images)
   }
 }
 

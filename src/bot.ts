@@ -1,7 +1,7 @@
 import { Jetstream } from 'atingester'
 import { CronJob } from 'cron'
 import { AtpAgent } from '@atproto/api'
-import { IdResolver } from '@atproto/identity'
+import { IdResolver, parseToAtprotoDocument } from '@atproto/identity'
 import { createDB, migrateToLatest } from './db'
 import { isJa, hourly, daily, weekly, monthly, yearly } from './job'
 import { type AppContext, env } from './util/config'
@@ -43,9 +43,11 @@ export class Bot {
 
     const agent = new AtpAgent({service: env.BLUESKY_SERVICE})
 
+    const idResolver = new IdResolver()
+
     const jetstreamLogger = createLogger(['Runner', 'Bot', 'Jetstream'])
     const jetstream = new Jetstream({
-      idResolver: new IdResolver(),
+      idResolver,
       handleEvent: async (evt) => {
         if (evt.event === 'create') {
           if (evt.collection === 'app.bsky.feed.post') {
@@ -78,6 +80,7 @@ export class Bot {
     const ctx: AppContext = {
       agent,
       db,
+      idResolver,
       logger,
     }
     
@@ -99,7 +102,7 @@ export class Bot {
       identifier: env.BLUESKY_IDENTIFIER,
       password: env.BLUESKY_PASSWORD,
     })
-    this.ctx.logger.info(`✓  Signed in as @${(await this.ctx.agent.getProfile({actor: this.ctx.agent.assertDid})).data.handle}`)
+    this.ctx.logger.info(`Signed in as @${await getVerifiedHandle(this.ctx.idResolver, this.ctx.agent.assertDid)}`)
     this.jetstream.start()
     this.hourlyJob.start()
     this.dailyJob.start()
@@ -120,4 +123,13 @@ export class Bot {
     await this.ctx.agent.logout()
     this.ctx.logger.info('Bot stopped')
   }
+}
+
+export const getVerifiedHandle = async (idResolver: IdResolver, did: string): Promise<string | undefined> => {
+  const didDoc = await idResolver.did.resolve(did)
+  if (!didDoc) return undefined
+  const { handle } = parseToAtprotoDocument(didDoc)
+  if (!handle) return undefined
+  const res = await idResolver.handle.resolve(handle)
+  return res === did ? handle : undefined
 }

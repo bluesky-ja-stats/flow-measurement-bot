@@ -1,6 +1,6 @@
 import { Jetstream } from 'atingester'
-import { AtpAgent, type AppBskyEmbedImages, type AppBskyFeedPost } from '@atproto/api'
-import { IdResolver } from '@atproto/identity'
+import { AtpAgent, type AppBskyEmbedImages, type AppBskyFeedGetPosts, type AppBskyFeedPost } from '@atproto/api'
+import { XRPCError } from '@atproto/xrpc'
 import { HistoryPosterTable } from './db/types'
 import {
   generateAllPosterImage,
@@ -33,7 +33,7 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
     },
   }
   const jetstream = new Jetstream({
-    idResolver: new IdResolver(),
+    idResolver: ctx.idResolver,
     handleEvent: (evt) => {
       if (cursors.all.length === 0 || evt.time_us < (cursors.all[0] + measureSecond*(10**6))) {
         cursors.all.push(evt.time_us)
@@ -62,10 +62,8 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
   await jetstream.start()
 
   ctx.logger.debug('close処理')
-  const maxUriSize = 25
-  for (const sepLikes of cursors.likes.all.flatMap((_, i, a) => i % maxUriSize ? [] : [a.slice(i, i + maxUriSize)])) {
-    await getPosts(ctx.agent, ctx.logger, cursors, sepLikes)
-  }
+  const posts = await getAllPosts(ctx.agent, ctx.logger, cursors.likes.all)
+  for (const post of posts) if (isJa(post.record)) cursors.likes.ja.push(post.uri)
 
   // DBに保存
   await ctx.db.insertInto('history').values({ created_at: d.toISOString(), like_all: cursors.likes.all.length*60/measureSecond, like_jp: cursors.likes.ja.length*60/measureSecond, post_all: cursors.posts.all.length*60/measureSecond, post_jp: cursors.posts.ja.length*60/measureSecond }).execute()
@@ -214,8 +212,12 @@ const createPost = async (agent: AtpAgent, logger: Logger, text: string, images:
     const res = await agent.post(record)
     logger.info(text)
     return res
-  } catch {
-    logger.error('AtpAgent could not create post. Try again now...')
+  } catch (e: unknown) {
+    if (e instanceof XRPCError) {
+      logger.error(`AtpAgent could not create post. ( ${e.message.replace('Error: ', '')} ) Try again now...`)
+    } else {
+      logger.error(`AtpAgent could not create post. Try again now...`)
+    }
     return await createPost(agent, logger, text, images)
   }
 }
@@ -224,8 +226,12 @@ const generateImageLex = async (agent: AtpAgent, logger: Logger, imageData: imag
   try {
     const uploaded = await agent.uploadBlob(imageData.buffer)
     return {$type: 'app.bsky.embed.images#image', image: uploaded.data.blob, aspectRatio: {...imageData.aspectRatio}, alt: imageData.title}
-  } catch {
-    logger.error('AtpAgent could not upload blob. Try again now...')
+  } catch (e: unknown) {
+    if (e instanceof XRPCError) {
+      logger.error(`AtpAgent could not upload blob. ( ${e.message.replace('Error: ', '')} ) Try again now...`)
+    } else {
+      logger.error(`AtpAgent could not upload blob. Try again now...`)
+    }
     return await generateImageLex(agent, logger, imageData)
   }
 }
@@ -236,13 +242,25 @@ const getDifference = (a: Set<string>, b: Set<string>): Set<string> => {
   )
 }
 
-const getPosts = async (agent: AtpAgent, logger: Logger, cursors: Cursors, uris: string[]): Promise<void> => {
+const getAllPosts = async (agent: AtpAgent, logger: Logger, uris: string[]): Promise<AppBskyFeedGetPosts.OutputSchema['posts']> => {
+  const maxUriSize = 25
+  const posts: AppBskyFeedGetPosts.OutputSchema['posts'] = []
+  for (const sepUris of uris.flatMap((_, i, a) => i % maxUriSize ? [] : [a.slice(i, i + maxUriSize)])) {
+    posts.push(...(await getPosts(agent, logger, sepUris)))
+  }
+  return posts
+}
+
+const getPosts = async (agent: AtpAgent, logger: Logger, uris: string[]): Promise<AppBskyFeedGetPosts.OutputSchema['posts']> => {
   try {
-    const posts = (await agent.getPosts({uris})).data.posts
-    for (const post of posts) if (isJa(post.record)) cursors.likes.ja.push(post.uri)
-  } catch {
-    logger.error('AtpAgent could not get posts. Try again now...')
-    await getPosts(agent, logger, cursors, uris)
+    return (await agent.getPosts({uris})).data.posts
+  } catch (e: unknown) {
+    if (e instanceof XRPCError) {
+      logger.error(`AtpAgent could not get posts. ( ${e.message.replace('Error: ', '')} ) Try again now...`)
+    } else {
+      logger.error(`AtpAgent could not get posts. Try again now...`)
+    }
+    return await getPosts(agent, logger, uris)
   }
 }
 

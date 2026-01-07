@@ -18,22 +18,23 @@
   "license": "MIT",
   "dependencies": {
     "@atproto/api": "^0.15.27",
-    "@atproto/identity": "^0.4.9",
-    "@napi-rs/canvas": "^0.1.80",
-    "atingester": "^1.0.0",
-    "better-sqlite3": "^12.2.0",
-    "chart.js": "^4.5.0",
-    "cron": "^4.3.3",
+    "@atproto/identity": "^0.4.10",
+    "@atproto/xrpc": "^0.7.7",
+    "@napi-rs/canvas": "^0.1.88",
+    "atingester": "^1.0.1",
+    "better-sqlite3": "^12.5.0",
+    "chart.js": "^4.5.1",
+    "cron": "^4.4.0",
     "dotenv": "^16.6.1",
-    "envalid": "^8.1.0",
-    "kysely": "^0.28.6"
+    "envalid": "^8.1.1",
+    "kysely": "^0.28.9"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^22.18.3",
-    "rimraf": "^6.0.1",
+    "@types/node": "^22.19.3",
+    "rimraf": "^6.1.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">= 22.14.0",

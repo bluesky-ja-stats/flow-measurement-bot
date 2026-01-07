@@ -81,4 +81,12 @@ export const createLogger = (childs: string[]): Logger => {
   }
 }
 
+process.on('uncaughtException', (e) => {
+  const text = `${e.stack}`
+  console.error(`\r\x1b[2K${text}`)
+  process.stdout.write('> ')
+  writeLog(text)
+  process.exit(1)
+})
+
 process.on('exit', () => logWriteStream.end())

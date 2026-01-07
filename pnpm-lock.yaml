@@ -21,8 +21,8 @@ importers:
         specifier: ^0.1.88
         version: 0.1.88
       atingester:
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.0.2
+        version: 1.0.2
       better-sqlite3:
         specifier: ^12.5.0
         version: 12.5.0
@@ -313,8 +313,8 @@ packages:
   array-flatten@1.1.1:
     resolution: {integrity: sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==}
 
-  atingester@1.0.1:
-    resolution: {integrity: sha512-RwHlbX7En3rsinY07SBbaxSXGzLd7HzL/biaVYiitejoPRvXohnuDJsXppG6z3PFnGEnWh2PneKIrScJf6UOmA==}
+  atingester@1.0.2:
+    resolution: {integrity: sha512-EHyo5VMVLlPn+SmGJGWmu98pT+huZDyN5agakfPVzYsMWHo4Y985MbnGNFZB8di51olleqkVlZ6Bkrs7Qw9yNQ==}
     engines: {node: '>= 18.7.0'}
 
   atomic-sleep@1.0.0:
@@ -1244,7 +1244,7 @@ snapshots:
 
   array-flatten@1.1.1: {}
 
-  atingester@1.0.1:
+  atingester@1.0.2:
     dependencies:
       '@atproto/common': 0.4.12
       '@atproto/common-web': 0.4.10

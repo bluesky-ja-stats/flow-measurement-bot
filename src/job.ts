@@ -71,11 +71,11 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
   await ctx.db.insertInto('history').values({ created_at: d.toISOString(), like_all: cursors.likes.all.length*60/measureSecond, like_jp: cursors.likes.ja.length*60/measureSecond, post_all: cursors.posts.all.length*60/measureSecond, post_jp: cursors.posts.ja.length*60/measureSecond }).execute()
 
   // DBからデータを取得しグラフを描画
-  const historyData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').limit(24).execute()).reverse()
+  const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').limit(24).execute()).reverse()
 
   const images: AppBskyEmbedImages.Image[] = []
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateDailyPostImage(historyData)))
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateDailyLikeImage(historyData)))
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateDailyPostImage(historyPostData)))
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateDailyLikeImage(historyPostData)))
 
   const text = `【測定データ】\n\n測定対象: ${d.toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'JST'})}\n測定時間: ${measureSecond.toLocaleString('ja-JP')}秒\n\n日本語を含む投稿: ${(cursors.posts.ja.length*60/measureSecond).toLocaleString('ja-JP')} [post/min]\n全ての投稿　　　: ${(cursors.posts.all.length*60/measureSecond).toLocaleString('ja-JP')} [post/min]\n\n日本語を含む投稿へのいいね: ${(cursors.likes.ja.length*60/measureSecond).toLocaleString('ja-JP')} [like/min]\n全てのいいね　　　　　　　: ${(cursors.likes.all.length*60/measureSecond).toLocaleString('ja-JP')} [like/min]`
   await createPost(ctx.agent, ctx.logger, text, images)
@@ -142,16 +142,16 @@ export const daily = async (ctx: AppContext): Promise<void> => {
 export const weekly = async (ctx: AppContext): Promise<void> => {
   ctx.logger.info('Start weekly job')
 
-  const historyData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').limit(7*24).execute()).reverse()
+  const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').limit(7*24).execute()).reverse()
   const historyPosterData = (await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'desc').limit(7).execute()).reverse()
 
   const images: AppBskyEmbedImages.Image[] = []
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateWeeklyPostImage(historyData)))
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateWeeklyLikeImage(historyData)))
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateWeeklyPostImage(historyPostData)))
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateWeeklyLikeImage(historyPostData)))
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateJpPosterImage('One-week', historyPosterData)))
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateAllPosterImage('One-week', historyPosterData)))
 
-  const text = `【週間報告】\n\n${new Date(historyData[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} ~ ${new Date(historyData.slice(-1)[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} における、投稿といいねの流速のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における、投稿者の増減のグラフです。`
+  const text = `【週間報告】\n\n${new Date(historyPostData[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} ~ ${new Date(historyPostData.slice(-1)[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} における投稿数及びいいね数の増減のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における投稿者数の増減のグラフです。`
   await createPost(ctx.agent, ctx.logger, text, images)
 }
 
@@ -169,7 +169,7 @@ export const monthly = async (ctx: AppContext): Promise<void> => {
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateJpPosterImage('One-month', historyPosterData)))
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateAllPosterImage('One-month', historyPosterData)))
 
-  const text = `【月間報告】\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における平均投稿数及び平均いいね数の増減のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における投稿者の増減のグラフです。`
+  const text = `【月間報告】\n\n${new Date(historyPostData[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} ~ ${new Date(historyPostData.slice(-1)[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} における平均投稿数及び平均いいね数の増減のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における投稿者数の増減のグラフです。`
   await createPost(ctx.agent, ctx.logger, text, images)
 }
 
@@ -187,7 +187,7 @@ export const yearly = async (ctx: AppContext): Promise<void> => {
   rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateJpPosterImage('One-year', historyPosterData)))
   rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateAllPosterImage('One-year', historyPosterData)))
 
-  const rootText = `【年間報告】(1/3)\n\n\\\\\\ Happy New Year ///\n\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における平均投稿数及び平均いいね数の増減のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における投稿者の増減のグラフです。`
+  const rootText = `【年間報告】(1/3)\n\n\\\\\\ Happy New Year ///\n\n${new Date(historyPostData[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} ~ ${new Date(historyPostData.slice(-1)[0].created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})} における平均投稿数及び平均いいね数の増減のグラフと、\n${historyPosterData[0].created_at} ~ ${historyPosterData.slice(-1)[0].created_at} における投稿者数の増減のグラフです。`
   const rootPost = await createPost(ctx.agent, ctx.logger, rootText, rootImages)
 
   const topHistoryData_post_jp = await ctx.db.selectFrom('history').selectAll().orderBy('post_jp', 'desc').executeTakeFirst()

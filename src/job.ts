@@ -13,10 +13,10 @@ import {
   generateWeeklyLikeImage,
 } from './image'
 import type { Cursors, imageData, Posters } from './types'
-import { type AppContext, env } from './util/config'
+import type { BotContext } from './util/config'
 import { type Logger } from './util/logger'
 
-export const hourly = async (ctx: AppContext): Promise<void> => {
+export const hourly = async (ctx: BotContext): Promise<void> => {
   ctx.logger.info('Start hourly job')
 
   const d = new Date()
@@ -52,7 +52,7 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
     },
     onInfo: ctx.logger.info,
     onError: (err: Error) => ctx.logger.error(err.message),
-    service: env.JETSTREAM_ENDPOINT,
+    service: ctx.cfg.jetstream.service,
     compress: true,
     filterCollections: ['app.bsky.feed.post', 'app.bsky.feed.like'],
     excludeIdentity: true,
@@ -79,7 +79,7 @@ export const hourly = async (ctx: AppContext): Promise<void> => {
   await createPost(ctx.agent, ctx.logger, text, images)
 }
 
-export const daily = async (ctx: AppContext): Promise<void> => {
+export const daily = async (ctx: BotContext): Promise<void> => {
   ctx.logger.info('Start daily job')
 
   const posters: Posters = {all: {}, jp: {}}
@@ -137,7 +137,7 @@ export const daily = async (ctx: AppContext): Promise<void> => {
   await createPost(ctx.agent, ctx.logger, text, [])
 }
 
-export const weekly = async (ctx: AppContext): Promise<void> => {
+export const weekly = async (ctx: BotContext): Promise<void> => {
   ctx.logger.info('Start weekly job')
 
   const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').limit(7*24).execute()).reverse()
@@ -153,7 +153,7 @@ export const weekly = async (ctx: AppContext): Promise<void> => {
   await createPost(ctx.agent, ctx.logger, text, images)
 }
 
-export const monthly = async (ctx: AppContext): Promise<void> => {
+export const monthly = async (ctx: BotContext): Promise<void> => {
   ctx.logger.info('Start monthly job')
 
   const targetDay = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})
@@ -171,7 +171,7 @@ export const monthly = async (ctx: AppContext): Promise<void> => {
   await createPost(ctx.agent, ctx.logger, text, images)
 }
 
-export const yearly = async (ctx: AppContext): Promise<void> => {
+export const yearly = async (ctx: BotContext): Promise<void> => {
   ctx.logger.info('Start yearly job')
 
   const targetDay = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})

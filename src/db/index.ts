@@ -2,12 +2,11 @@ import SQLite from 'better-sqlite3'
 import { Kysely, Migrator, SqliteDialect } from 'kysely'
 import { migrationProvider } from './migration'
 import type { DatabaseSchema } from './types'
-import { env } from '../util/config'
 
-export async function createDB() {
+export function createDb(location: string): Database {
   return new Kysely<DatabaseSchema>({
     dialect: new SqliteDialect({
-      database: new SQLite(env.SQLITE_PATH),
+      database: new SQLite(location),
     }),
   })
 }

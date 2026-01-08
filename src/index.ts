@@ -4,7 +4,7 @@ import { initIngester } from 'atingester'
 import { Bot } from './bot'
 import { closeSignal } from './cmds/stop'
 import { setupCmd } from './util/cmd'
-import { env } from './util/config'
+import { type BotConfig, env } from './util/config'
 import { createLogger } from './util/logger'
 
 const run = async () => {
@@ -15,7 +15,20 @@ const run = async () => {
 
   await initIngester()
 
-  const bot = await Bot.create()
+  const botCfg: BotConfig = {
+    atpAgent: {
+      service: env.BLUESKY_SERVICE,
+      identifier: env.BLUESKY_IDENTIFIER,
+      password: env.BLUESKY_PASSWORD,
+    },
+    db: {
+      dbLoc: env.SQLITE_PATH,
+    },
+    jetstream: {
+      service: env.JETSTREAM_ENDPOINT,
+    },
+  }
+  const bot = await Bot.create(botCfg)
 
   setupCmd(bot, createLogger(['Runner', 'Commander']))
 

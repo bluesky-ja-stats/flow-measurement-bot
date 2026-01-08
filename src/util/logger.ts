@@ -3,9 +3,9 @@ import path from 'path'
 import { env } from './config'
 
 process.stdout.write('Setting up logging file...')
-const logDirName = 'logs'
-if (!fs.existsSync(logDirName)) fs.mkdirSync(logDirName, {recursive: true})
-const logFilePath = path.join(logDirName, `${new Date().toISOString().replaceAll(':','-').replace('.',',')}.txt`)
+const logDirPath = env.LOG_PATH
+if (!fs.existsSync(logDirPath)) fs.mkdirSync(logDirPath, {recursive: true})
+const logFilePath = path.join(logDirPath, `${new Date().toISOString().replaceAll(':','-').replace('.',',')}.txt`)
 const logWriteStream = fs.createWriteStream(path.resolve(logFilePath), {encoding: 'utf8', flags: 'wx'})
 const writeLog = (text: string) => {
   logWriteStream.write(`${text}\n`)

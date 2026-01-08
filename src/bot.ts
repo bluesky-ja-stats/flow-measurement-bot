@@ -2,46 +2,48 @@ import { Jetstream } from 'atingester'
 import { CronJob } from 'cron'
 import { AtpAgent } from '@atproto/api'
 import { IdResolver, parseToAtprotoDocument } from '@atproto/identity'
-import { createDB, migrateToLatest } from './db'
+import { createDb, migrateToLatest } from './db'
 import { isJa, hourly, daily, weekly, monthly, yearly } from './job'
-import { type AppContext, env } from './util/config'
+import type { BotContext, BotConfig } from './util/config'
 import { createLogger } from './util/logger'
 
 export class Bot {
-  public ctx: AppContext
+  public ctx: BotContext
   public jetstream: Jetstream
-  public hourlyJob: CronJob
-  public dailyJob: CronJob
-  public weeklyJob: CronJob
-  public monthlyJob: CronJob
-  public yearlyJob: CronJob
+  public job: {
+    hourly: CronJob
+    daily: CronJob
+    weekly: CronJob
+    monthly: CronJob
+    yearly: CronJob
+  }
 
   constructor(
-    ctx: AppContext,
+    ctx: BotContext,
     jetstream: Jetstream,
-    hourlyJob: CronJob,
-    dailyJob: CronJob,
-    weeklyJob: CronJob,
-    monthlyJob: CronJob,
-    yearlyJob: CronJob
+    job: {
+      hourly: CronJob,
+      daily: CronJob,
+      weekly: CronJob,
+      monthly: CronJob,
+      yearly: CronJob
+    }
   ) {
     this.ctx = ctx
     this.jetstream = jetstream
-    this.hourlyJob = hourlyJob
-    this.dailyJob = dailyJob
-    this.weeklyJob = weeklyJob
-    this.monthlyJob = monthlyJob
-    this.yearlyJob = yearlyJob
+    this.job = job
   }
 
-  static async create() {
+  static async create(
+    cfg: BotConfig
+  ): Promise<Bot> {
     const logger = createLogger(['Runner', 'Bot'])
     logger.info('Creating bot...')
 
-    logger.info(`Creating DB => ${env.SQLITE_PATH}`)
-    const db = await createDB()
+    logger.info(`Creating DB => ${cfg.db.dbLoc}`)
+    const db = createDb(cfg.db.dbLoc)
 
-    const agent = new AtpAgent({service: env.BLUESKY_SERVICE})
+    const agent = new AtpAgent({service: cfg.atpAgent.service})
 
     const idResolver = new IdResolver()
 
@@ -70,55 +72,58 @@ export class Bot {
       },
       onInfo: jetstreamLogger.info,
       onError: (err: Error) => jetstreamLogger.error(err.message),
-      service: env.JETSTREAM_ENDPOINT,
+      service: cfg.jetstream.service,
       compress: true,
       filterCollections: ['app.bsky.feed.post'],
       excludeIdentity: true,
       excludeAccount: true,
     })
 
-    const ctx: AppContext = {
+    const ctx: BotContext = {
       agent,
+      cfg,
       db,
       idResolver,
       logger,
     }
-    
-    const hourlyJob = new CronJob('0 0 * * * *', async () => await hourly({...ctx, logger: createLogger(['Runner', 'Bot', 'HourlyJob'])}))
-    const dailyJob = new CronJob('5 0 0 * * *', async () => await daily({...ctx, logger: createLogger(['Runner', 'Bot', 'DailyJob'])}))
-    const weeklyJob = new CronJob('0 2 0 * * 1', async () => await weekly({...ctx, logger: createLogger(['Runner', 'Bot', 'WeeklyJob'])}))
-    const monthlyJob = new CronJob('0 2 0 1 * *', async () => await monthly({...ctx, logger: createLogger(['Runner', 'Bot', 'MonthlyJob'])}))
-    const yearlyJob = new CronJob('0 2 0 1 1 *', async () => await yearly({...ctx, logger: createLogger(['Runner', 'Bot', 'YearlyJob'])}))
+
+    const job = {
+      hourly: new CronJob('0 0 * * * *', async () => await hourly({...ctx, logger: createLogger(['Runner', 'Bot', 'Job', 'Hourly'])})),
+      daily: new CronJob('5 0 0 * * *', async () => await daily({...ctx, logger: createLogger(['Runner', 'Bot', 'Job', 'Daily'])})),
+      weekly: new CronJob('0 2 0 * * 1', async () => await weekly({...ctx, logger: createLogger(['Runner', 'Bot', 'Job', 'Weekly'])})),
+      monthly: new CronJob('0 2 0 1 * *', async () => await monthly({...ctx, logger: createLogger(['Runner', 'Bot', 'Job', 'Monthly'])})),
+      yearly: new CronJob('0 2 0 1 1 *', async () => await yearly({...ctx, logger: createLogger(['Runner', 'Bot', 'Job', 'Yearly'])})),
+    }
 
     logger.info('Bot has been created!')
 
-    return new Bot(ctx, jetstream, hourlyJob, dailyJob, weeklyJob, monthlyJob, yearlyJob)
+    return new Bot(ctx, jetstream, job)
   }
 
   async start() {
     this.ctx.logger.info('Starting bot...')
     await migrateToLatest(this.ctx.db)
     await this.ctx.agent.login({
-      identifier: env.BLUESKY_IDENTIFIER,
-      password: env.BLUESKY_PASSWORD,
+      identifier: this.ctx.cfg.atpAgent.identifier,
+      password: this.ctx.cfg.atpAgent.password,
     })
     this.ctx.logger.info(`Signed in as @${await getVerifiedHandle(this.ctx.idResolver, this.ctx.agent.assertDid)}`)
     this.jetstream.start()
-    this.hourlyJob.start()
-    this.dailyJob.start()
-    this.weeklyJob.start()
-    this.monthlyJob.start()
-    this.yearlyJob.start()
+    this.job.hourly.start()
+    this.job.daily.start()
+    this.job.weekly.start()
+    this.job.monthly.start()
+    this.job.yearly.start()
     this.ctx.logger.info('Bot started')
   }
 
   async stop() {
     this.ctx.logger.info('Stopping bot...')
-    await this.hourlyJob.stop()
-    await this.dailyJob.stop()
-    await this.weeklyJob.stop()
-    await this.monthlyJob.stop()
-    await this.yearlyJob.stop()
+    await this.job.hourly.stop()
+    await this.job.daily.stop()
+    await this.job.weekly.stop()
+    await this.job.monthly.stop()
+    await this.job.yearly.stop()
     await this.jetstream.destroy()
     await this.ctx.agent.logout()
     this.ctx.logger.info('Bot stopped')

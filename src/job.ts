@@ -158,12 +158,12 @@ export const monthly = async (ctx: BotContext): Promise<void> => {
 
   const targetDay = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})
 
-  const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').execute()).reverse()
-  const historyPosterData = (await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'desc').where('created_at', 'like', `${targetDay.split('-').slice(0, 2).join('-')}-%`).execute()).reverse()
+  const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'asc').execute()).filter(v => new Date(v.created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'}).includes(targetDay.split('-').slice(0, 2).join('-')))
+  const historyPosterData = await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'asc').where('created_at', 'like', `${targetDay.split('-').slice(0, 2).join('-')}-%`).execute()
 
   const images: AppBskyEmbedImages.Image[] = []
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAveragePostImage('One-month', historyPostData, targetDay.split('-').slice(0, 2).join('-'))))
-  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAverageLikeImage('One-month', historyPostData, targetDay.split('-').slice(0, 2).join('-'))))
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAveragePostImage('One-month', historyPostData)))
+  images.push(await generateImageLex(ctx.agent, ctx.logger, generateAverageLikeImage('One-month', historyPostData)))
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateJpPosterImage('One-month', historyPosterData)))
   images.push(await generateImageLex(ctx.agent, ctx.logger, generateAllPosterImage('One-month', historyPosterData)))
 
@@ -176,12 +176,12 @@ export const yearly = async (ctx: BotContext): Promise<void> => {
 
   const targetDay = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})
 
-  const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'desc').execute()).reverse()
-  const historyPosterData = (await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'desc').where('created_at', 'like', `${targetDay.split('-')[0]}-%`).execute()).reverse()
+  const historyPostData = (await ctx.db.selectFrom('history').selectAll().orderBy('created_at', 'asc').execute()).filter(v => new Date(v.created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'}).includes(targetDay.split('-')[0]))
+  const historyPosterData = await ctx.db.selectFrom('history_poster').selectAll().orderBy('created_at', 'asc').where('created_at', 'like', `${targetDay.split('-')[0]}-%`).execute()
 
   const rootImages: AppBskyEmbedImages.Image[] = []
-  rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateAveragePostImage('One-year', historyPostData, targetDay.split('-')[0])))
-  rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateAverageLikeImage('One-year', historyPostData, targetDay.split('-')[0])))
+  rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateAveragePostImage('One-year', historyPostData)))
+  rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateAverageLikeImage('One-year', historyPostData)))
   rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateJpPosterImage('One-year', historyPosterData)))
   rootImages.push(await generateImageLex(ctx.agent, ctx.logger, generateAllPosterImage('One-year', historyPosterData)))
 

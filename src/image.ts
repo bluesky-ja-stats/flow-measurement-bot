@@ -82,15 +82,13 @@ export function generateJpPosterImage(prefix: string, data: SelectPosterHistory[
   return { title, buffer, aspectRatio: {width, height}}
 }
 
-export function generateAveragePostImage(prefix: string, data: SelectHistory[], searchString: string): imageData {
+export function generateAveragePostImage(prefix: string, data: SelectHistory[]): imageData {
   const sortedData: {[k: string]: {all: number[], ja: number[]}} = {}
   for (const d of data) {
     const targetDay = new Date(d.created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})
-    if (targetDay.includes(searchString)){
-      if (!(targetDay in sortedData)) sortedData[targetDay] = {all: [], ja: []}
-      sortedData[targetDay].all.push(d.post_all)
-      sortedData[targetDay].ja.push(d.post_jp)
-    }
+    if (!(targetDay in sortedData)) sortedData[targetDay] = {all: [], ja: []}
+    sortedData[targetDay].all.push(d.post_all)
+    sortedData[targetDay].ja.push(d.post_jp)
   }
   const title = `${prefix} Average of Post per Minute / ${Object.keys(sortedData)[0]} ~ ${Object.keys(sortedData).slice(-1)[0]}`
   const width = 1920
@@ -124,15 +122,13 @@ export function generateAveragePostImage(prefix: string, data: SelectHistory[], 
   return { title, buffer, aspectRatio: {width, height}}
 }
 
-export function generateAverageLikeImage(prefix: string, data: SelectHistory[], searchString: string): imageData {
+export function generateAverageLikeImage(prefix: string, data: SelectHistory[]): imageData {
   const sortedData: {[k: string]: {all: number[], ja: number[]}} = {}
   for (const d of data) {
     const targetDay = new Date(d.created_at).toLocaleDateString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'JST'})
-    if (targetDay.includes(searchString)){
-      if (!(targetDay in sortedData)) sortedData[targetDay] = {all: [], ja: []}
-      sortedData[targetDay].all.push(d.like_all)
-      sortedData[targetDay].ja.push(d.like_jp)
-    }
+    if (!(targetDay in sortedData)) sortedData[targetDay] = {all: [], ja: []}
+    sortedData[targetDay].all.push(d.like_all)
+    sortedData[targetDay].ja.push(d.like_jp)
   }
   const title = `${prefix} Average of Like per Minute / ${Object.keys(sortedData)[0]} ~ ${Object.keys(sortedData).slice(-1)[0]}`
   const width = 1920
